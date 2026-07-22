@@ -20,7 +20,7 @@ type User struct {
 }
 
 type LoginEvent struct {
-	ID         int
+	ID         uuid.UUID
 	User       User
 	LoggenInAt time.Time
 	IPAdress   netip.Addr
@@ -28,7 +28,7 @@ type LoginEvent struct {
 }
 
 type UserEvent struct {
-	ID         int
+	ID         uuid.UUID
 	User       User
 	HappenedAt time.Time
 	EventType  string
@@ -41,4 +41,12 @@ type RefreshToken struct {
 	TokenHash string
 	CreatedAt time.Time
 	ExpiresAt time.Time
+}
+
+type Event struct {
+	ID         uuid.UUID
+	User       User
+	HappenedAt time.Time
+	EventType  string
+	EventBody  json.RawMessage
 }
