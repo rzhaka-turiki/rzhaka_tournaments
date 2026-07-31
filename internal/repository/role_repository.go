@@ -14,6 +14,7 @@ type RoleRepository interface {
 	GetUserRoles(ctx context.Context, userID uuid.UUID) ([]model.Role, error)
 	GetRoleByID(ctx context.Context, id int) (*model.Role, error)
 	GetUserPermissions(ctx context.Context, userID uuid.UUID) ([]model.Permission, error)
+	GetHighestUserRole(ctx context.Context, userID uuid.UUID) (*model.Role, error)
 	// misc
 	HasPermission(ctx context.Context, userID uuid.UUID, permission string) (bool, error)
 	AddUserRole(ctx context.Context, userID uuid.UUID, roleID int) error
@@ -159,4 +160,35 @@ func (r *roleRepository) HasPermission(ctx context.Context, userID uuid.UUID, pe
 	var exists bool
 	err := r.db.QueryRow(ctx, query, userID, permission).Scan(&exists)
 	return exists, err
+}
+
+func (r *roleRepository) GetHighestUserRole(ctx context.Context, userID uuid.UUID) (*model.Role, error) {
+	query := `
+		SELECT
+			r.id,
+			r.name,
+			r.role_color,
+			r.position,
+			r.is_system,
+			r.created_at
+		FROM roles r
+		JOIN user_roles ur
+			ON ur.role_id = r.id
+		WHERE ur.user_id = $1
+		ORDER BY r.position DESC
+		LIMIT 1
+	`
+	var role model.Role
+	err := r.db.QueryRow(ctx, query, userID).Scan(
+		&role.ID,
+		&role.Name,
+		&role.RoleColor,
+		&role.Position,
+		&role.IsSystem,
+		&role.CreatedAt,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &role, nil
 }
