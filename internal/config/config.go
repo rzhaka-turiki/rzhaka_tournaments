@@ -6,49 +6,71 @@ import (
 )
 
 type Config struct {
-	DatabaseURL   string
-	EncryptionKey string // base64
+	Server   ServerConfig
+	Database DatabaseConfig
+	Results  ResultsConfig
+	Redis    RedisConfig
+	Bot      BotConfig
+	JWT      JWTConfig
+}
 
-	// Auth
-	AuthPort            string
-	DiscordClientID     string
-	DiscordClientSecret string
-	AuthRedirectURL     string
-	FrontendURL         string
-	JWTSecret           string
-	JWTAccessTTL        time.Duration
-	JWTRefreshTTL       time.Duration
+type ServerConfig struct {
+	Port string
+}
 
-	// main api links
-	ServerPort      string
-	GRPCResultsAddr string
-	RedisAddr       string
-	BotToken        string // JWT-token for discord bot
+type DatabaseConfig struct {
+	URL string
+}
+
+type ResultsConfig struct {
+	GRPCAddr string
+}
+
+type RedisConfig struct {
+	Addr string
+}
+
+type BotConfig struct {
+	Token string
+}
+
+type JWTConfig struct {
+	PublicKeyPath string
+	AccessTTL     time.Duration
 }
 
 func Load() *Config {
-	// env variables
 	return &Config{
-		DatabaseURL:         getEnv("DATABASE_URL", "postgres://user:pass@localhost/apex?sslmode=disable"),
-		EncryptionKey:       getEnv("ENCRYPTION_KEY", ""),
-		AuthPort:            getEnv("AUTH_PORT", "8081"),
-		DiscordClientID:     getEnv("DISCORD_CLIENT_ID", ""),
-		DiscordClientSecret: getEnv("DISCORD_CLIENT_SECRET", ""),
-		AuthRedirectURL:     getEnv("AUTH_REDIRECT_URL", "http://localhost:8081/auth/discord/callback"),
-		FrontendURL:         getEnv("FRONTEND_URL", "http://localhost:3000"),
-		JWTSecret:           getEnv("JWT_SECRET", "change-me"),
-		JWTAccessTTL:        15 * time.Minute,
-		JWTRefreshTTL:       7 * 24 * time.Hour,
-		ServerPort:          getEnv("SERVER_PORT", "8080"),
-		GRPCResultsAddr:     getEnv("GRPC_RESULTS_ADDR", "results:50051"),
-		RedisAddr:           getEnv("REDIS_ADDR", ""),
-		BotToken:            getEnv("BOT_TOKEN", ""),
+		Server: ServerConfig{
+			Port: getEnv("SERVER_PORT", "8080"),
+		},
+
+		Database: DatabaseConfig{
+			URL: getEnv("DATABASE_URL", "postgres://user:pass@localhost/apex?sslmode=disable"),
+		},
+
+		Results: ResultsConfig{
+			GRPCAddr: getEnv("GRPC_RESULTS_ADDR", "results:50051"),
+		},
+
+		Redis: RedisConfig{
+			Addr: getEnv("REDIS_ADDR", ""),
+		},
+
+		Bot: BotConfig{
+			Token: getEnv("BOT_TOKEN", ""),
+		},
+
+		JWT: JWTConfig{
+			PublicKeyPath: getEnv("JWT_PUBLIC_KEY", "./keys/public.pem"),
+			AccessTTL:     15 * time.Minute,
+		},
 	}
 }
 
-func getEnv(key, defaultVal string) string {
-	if v := os.Getenv(key); v != "" {
-		return v
+func getEnv(key, fallback string) string {
+	if value := os.Getenv(key); value != "" {
+		return value
 	}
-	return defaultVal
+	return fallback
 }
