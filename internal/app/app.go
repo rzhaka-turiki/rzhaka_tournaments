@@ -8,6 +8,7 @@ import (
 	"github.com/a1uka/rzhaka_tournaments/internal/database"
 	"github.com/a1uka/rzhaka_tournaments/internal/transport/rest"
 	"github.com/a1uka/rzhaka_tournaments/internal/transport/rest/handlers"
+	"github.com/a1uka/rzhaka_tournaments/internal/transport/rest/middleware"
 	"github.com/a1uka/rzhaka_tournaments/internal/transport/rest/routes"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -32,7 +33,10 @@ func New() (*App, error) {
 	}
 
 	// http router create
-	router := gin.Default()
+	router := gin.New()
+	router.Use(middleware.Logger(), middleware.Recovery())
+
+	// container w/ handlers
 	container := NewContainer(db)
 	restHandlers := rest.Handlers{
 		Health: handlers.NewHealthHandler(db),
