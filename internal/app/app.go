@@ -33,10 +33,11 @@ func New() (*App, error) {
 
 	// http router create
 	router := gin.Default()
+	container := NewContainer(db)
+
 	healthHandler := handlers.NewHealthHandler(db)
 
-	// reg routes
-	rest.RegisterRoutes(router, healthHandler)
+	rest.RegisterRoutes(router, healthHandler, container.UserHandler)
 
 	return &App{
 		cfg:    cfg,

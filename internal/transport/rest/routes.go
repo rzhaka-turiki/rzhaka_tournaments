@@ -8,11 +8,16 @@ import (
 func RegisterRoutes(
 	router *gin.Engine,
 	healthHandler *handlers.HealthHandler,
+	users *handlers.UserHandler,
 ) {
-	api := router.Group("/")
-
+	// service ends
+	router.GET("/health", healthHandler.Health)
+	router.GET("health/db", healthHandler.DBHealth)
+	v1 := router.Group("/api/v1")
 	{
-		api.GET("/health", healthHandler.Health)
-		api.GET("/health/db", healthHandler.DBHealth)
+		usersGroup := v1.Group("/users")
+		{
+			usersGroup.GET("/:id", users.GetByID)
+		}
 	}
 }
