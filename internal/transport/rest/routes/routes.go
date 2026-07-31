@@ -13,5 +13,6 @@ func RegisterRoutes(
 	v1 := router.Group("/api/v1")
 	{
 		registerUsers(v1, h.User)
+		registerRoles(v1, h.Role)
 	}
 }

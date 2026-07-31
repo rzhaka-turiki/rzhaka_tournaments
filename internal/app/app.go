@@ -14,9 +14,10 @@ import (
 )
 
 type App struct {
-	cfg    *config.Config
-	db     *pgxpool.Pool
-	router *gin.Engine
+	cfg       *config.Config
+	db        *pgxpool.Pool
+	router    *gin.Engine
+	container *Container
 }
 
 func New() (*App, error) {
@@ -43,13 +44,15 @@ func New() (*App, error) {
 	restHandlers := rest.Handlers{
 		Health: handlers.NewHealthHandler(db),
 		User:   handlers.NewUserHandler(container.Services.User),
+		Role:   handlers.NewRoleHandler(container.Services.Role),
 	}
 	routes.RegisterRoutes(router, &restHandlers)
 
 	return &App{
-		cfg:    cfg,
-		db:     db,
-		router: router,
+		cfg:       cfg,
+		db:        db,
+		router:    router,
+		container: container,
 	}, nil
 }
 
