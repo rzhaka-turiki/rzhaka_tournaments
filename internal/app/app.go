@@ -21,8 +21,10 @@ type App struct {
 }
 
 func New() (*App, error) {
-	cfg := config.Load()
-
+	cfg, err := config.Load()
+	if err != nil {
+		return nil, err
+	}
 	// db conn
 	db, err := database.Connect(cfg.Database.URL)
 	if err != nil {
@@ -31,7 +33,7 @@ func New() (*App, error) {
 
 	// http router create
 	router := gin.Default()
-	healthHandler := handlers.NewHealthHandler()
+	healthHandler := handlers.NewHealthHandler(db)
 
 	// reg routes
 	rest.RegisterRoutes(router, healthHandler)

@@ -1,8 +1,11 @@
 package config
 
 import (
+	"errors"
 	"os"
 	"time"
+
+	"github.com/joho/godotenv"
 )
 
 type Config struct {
@@ -39,14 +42,15 @@ type JWTConfig struct {
 	AccessTTL     time.Duration
 }
 
-func Load() *Config {
-	return &Config{
+func Load() (*Config, error) {
+	_ = godotenv.Load()
+	cfg := &Config{
 		Server: ServerConfig{
 			Port: getEnv("SERVER_PORT", "8080"),
 		},
 
 		Database: DatabaseConfig{
-			URL: getEnv("DATABASE_URL", "postgres://user:pass@localhost/apex?sslmode=disable"),
+			URL: getEnv("DATABASE_URL", ""),
 		},
 
 		Results: ResultsConfig{
@@ -66,6 +70,10 @@ func Load() *Config {
 			AccessTTL:     15 * time.Minute,
 		},
 	}
+	if cfg.Database.URL == "" {
+		return nil, errors.New("DATABASE_URL is not set")
+	}
+	return cfg, nil
 }
 
 func getEnv(key, fallback string) string {
