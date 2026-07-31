@@ -1,7 +1,6 @@
 package app
 
 import (
-	"context"
 	"log"
 
 	"github.com/a1uka/rzhaka_tournaments/internal/config"
@@ -15,10 +14,9 @@ import (
 )
 
 type App struct {
-	cfg       *config.Config
-	db        *pgxpool.Pool
-	router    *gin.Engine
-	container *Container
+	cfg    *config.Config
+	db     *pgxpool.Pool
+	router *gin.Engine
 }
 
 func New() (*App, error) {
@@ -34,7 +32,11 @@ func New() (*App, error) {
 
 	// http router create
 	router := gin.New()
-	router.Use(middleware.Logger(), middleware.Recovery())
+	router.Use(
+		middleware.RequestID(),
+		middleware.Logger(),
+		middleware.Recovery(),
+	)
 
 	// container w/ handlers
 	container := NewContainer(db)
@@ -45,10 +47,9 @@ func New() (*App, error) {
 	routes.RegisterRoutes(router, &restHandlers)
 
 	return &App{
-		cfg:       cfg,
-		db:        db,
-		router:    router,
-		container: container,
+		cfg:    cfg,
+		db:     db,
+		router: router,
 	}, nil
 }
 
@@ -57,17 +58,8 @@ func (a *App) Run() error {
 }
 
 func (a *App) Shutdown() {
-	ctx, cancel := context.WithTimeout(
-		context.Background(),
-		5,
-	)
-	defer cancel()
-
 	if a.db != nil {
 		a.db.Close()
 	}
-
 	log.Println("application stopped")
-
-	_ = ctx
 }
