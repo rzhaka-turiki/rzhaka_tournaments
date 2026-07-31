@@ -8,16 +8,16 @@ import (
 	"github.com/a1uka/rzhaka_tournaments/internal/database"
 	"github.com/a1uka/rzhaka_tournaments/internal/transport/rest"
 	"github.com/a1uka/rzhaka_tournaments/internal/transport/rest/handlers"
+	"github.com/a1uka/rzhaka_tournaments/internal/transport/rest/routes"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type App struct {
-	cfg *config.Config
-
-	db *pgxpool.Pool
-
-	router *gin.Engine
+	cfg       *config.Config
+	db        *pgxpool.Pool
+	router    *gin.Engine
+	container *Container
 }
 
 func New() (*App, error) {
@@ -34,15 +34,17 @@ func New() (*App, error) {
 	// http router create
 	router := gin.Default()
 	container := NewContainer(db)
-
-	healthHandler := handlers.NewHealthHandler(db)
-
-	rest.RegisterRoutes(router, healthHandler, container.UserHandler)
+	restHandlers := rest.Handlers{
+		Health: handlers.NewHealthHandler(db),
+		User:   handlers.NewUserHandler(container.Services.User),
+	}
+	routes.RegisterRoutes(router, &restHandlers)
 
 	return &App{
-		cfg:    cfg,
-		db:     db,
-		router: router,
+		cfg:       cfg,
+		db:        db,
+		router:    router,
+		container: container,
 	}, nil
 }
 
