@@ -16,7 +16,8 @@ type User struct {
 	DiscordIDHash      []byte    `json:"-" db:"discord_id_hash"`
 	Username           string    `json:"username" db:"username"`
 	AvatarURL          *string   `json:"avatar_url,omitempty" db:"avatar_url"`
-	Role               string    `json:"role" db:"role"`
+	Status             string    `json:"status" db:"status"`
+	UpdatedAt          time.Time `json:"updated_at" db:"updated_at"`
 	CreatedAt          time.Time `json:"created_at" db:"created_at"`
 }
 
