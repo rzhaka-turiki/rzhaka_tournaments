@@ -24,16 +24,16 @@ func NewUserHandler(userService service.UserService) *UserHandler {
 func (h *UserHandler) GetByID(c *gin.Context) {
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		response.Fail(c, http.StatusBadRequest, "INVALID_UUID", "invalid uuid")
+		HandleError(c, err)
 		return
 	}
 	user, err := h.userService.GetByID(c.Request.Context(), id)
 	if err != nil {
 		if errors.Is(err, service.ErrUserNotFound) {
-			response.Fail(c, http.StatusNotFound, "USER_NOT_FOUND", "user not found")
+			HandleError(c, err)
 			return
 		}
-		response.Fail(c, http.StatusInternalServerError, "INTERNAL_ERROR", "internal server error")
+		HandleError(c, err)
 		return
 	}
 	response.Success(c, http.StatusOK, dto.FromUser(user))

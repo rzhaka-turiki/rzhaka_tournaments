@@ -6,6 +6,15 @@ import (
 )
 
 func registerRoles(router *gin.RouterGroup, roleHandler *handlers.RoleHandler) {
+	roles := router.Group("/roles")
+	{
+		roles.POST("", roleHandler.CreateRole)
+		roles.GET("", roleHandler.GetAllRoles)
+	}
+	permissions := router.Group("/permissions")
+	{
+		permissions.GET("", roleHandler.GetAllPermissions)
+	}
 	users := router.Group("/users")
 	{
 		users.GET("/:id/roles", roleHandler.GetUserRoles)

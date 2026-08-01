@@ -15,10 +15,15 @@ type RoleRepository interface {
 	GetRoleByID(ctx context.Context, id int) (*model.Role, error)
 	GetUserPermissions(ctx context.Context, userID uuid.UUID) ([]model.Permission, error)
 	GetHighestUserRole(ctx context.Context, userID uuid.UUID) (*model.Role, error)
+	GetAllRoles(ctx context.Context) ([]model.Role, error)
+	GetAllPermissions(ctx context.Context) ([]model.Permission, error)
 	// misc
 	HasPermission(ctx context.Context, userID uuid.UUID, permission string) (bool, error)
 	AddUserRole(ctx context.Context, userID uuid.UUID, roleID int) error
 	RemoveUserRole(ctx context.Context, userID uuid.UUID, roleID int) error
+
+	// Role management
+	Create(ctx context.Context, role *model.Role) error
 }
 
 type roleRepository struct {
@@ -191,4 +196,83 @@ func (r *roleRepository) GetHighestUserRole(ctx context.Context, userID uuid.UUI
 		return nil, err
 	}
 	return &role, nil
+}
+
+func (r *roleRepository) GetAllRoles(ctx context.Context) ([]model.Role, error) {
+	query := `
+	SELECT
+    	id,
+    	name,
+    	position,
+    	role_color
+	FROM roles
+	ORDER BY position DESC;
+	`
+
+	rows, err := r.db.Query(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var roles []model.Role
+
+	for rows.Next() {
+		var role model.Role
+		err := rows.Scan(
+			&role.ID,
+			&role.Name,
+			&role.Position,
+			&role.RoleColor,
+		)
+		if err != nil {
+			return nil, err
+		}
+		roles = append(roles, role)
+	}
+	return roles, rows.Err()
+}
+
+func (r *roleRepository) GetAllPermissions(ctx context.Context) ([]model.Permission, error) {
+	query := `
+	SELECT
+    	id,
+    	code, 
+    	description
+	FROM permissions
+	ORDER BY code;
+	`
+
+	rows, err := r.db.Query(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var permissions []model.Permission
+
+	for rows.Next() {
+		var permission model.Permission
+		err := rows.Scan(
+			&permission.ID,
+			&permission.Code,
+			&permission.Description,
+		)
+		if err != nil {
+			return nil, err
+		}
+		permissions = append(permissions, permission)
+	}
+	return permissions, rows.Err()
+}
+
+func (r *roleRepository) Create(ctx context.Context, role *model.Role) error {
+	query := `
+	INSERT INTO roles (
+		name,
+		position,
+		role_color
+	)
+	VALUES ($1,$2,$3)
+	RETURNING id
+	`
+	return r.db.QueryRow(ctx, query, role.Name, role.Position, role.RoleColor).Scan(&role.ID)
 }

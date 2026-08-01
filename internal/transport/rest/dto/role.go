@@ -13,6 +13,12 @@ type AssignRoleRequest struct {
 	RoleID int `json:"role_id" binding:"required"`
 }
 
+type CreateRoleRequest struct {
+	Name      string `json:"name" binding:"required"`
+	Position  int    `json:"position" binding:"required"`
+	RoleColor string `json:"role_color"`
+}
+
 func FromRole(role model.Role) RoleResponse {
 	return RoleResponse{
 		ID:       role.ID,

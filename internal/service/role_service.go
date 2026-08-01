@@ -14,8 +14,12 @@ import (
 type RoleService interface {
 	GetUserRoles(ctx context.Context, userID uuid.UUID) ([]model.Role, error)
 	GetUserPermissions(ctx context.Context, userID uuid.UUID) ([]model.Permission, error)
+	GetAllRoles(ctx context.Context) ([]model.Role, error)
+	GetAllPermissions(ctx context.Context) ([]model.Permission, error)
 	AssignRole(ctx context.Context, actorID uuid.UUID, targetUserID uuid.UUID, roleID int) error
 	RemoveRole(ctx context.Context, actorID uuid.UUID, targetUserID uuid.UUID, roleID int) error
+
+	CreateRole(ctx context.Context, actorID uuid.UUID, role *model.Role) error
 }
 
 type roleService struct {
@@ -154,5 +158,54 @@ func (s *roleService) RemoveRole(ctx context.Context, actorID uuid.UUID, targetU
 			Payload:   payload,
 		}
 		return eventRepository.Create(ctx, event)
+	})
+}
+
+func (s *roleService) GetAllRoles(ctx context.Context) ([]model.Role, error) {
+	return s.roleRepository.GetAllRoles(ctx)
+}
+
+func (s *roleService) GetAllPermissions(ctx context.Context) ([]model.Permission, error) {
+	return s.roleRepository.GetAllPermissions(ctx)
+}
+
+func (s *roleService) CreateRole(ctx context.Context, actorID uuid.UUID, role *model.Role) error {
+	return s.txManager.WithinTransaction(ctx, func(tx pgx.Tx) error {
+		roleRepo := repository.NewRoleRepository(tx)
+		eventRepo := repository.NewEventRepository(tx)
+
+		if err := s.hasPermission(ctx, roleRepo, actorID, "role.create"); err != nil {
+			return err
+		}
+
+		actorRole, err := roleRepo.GetHighestUserRole(ctx, actorID)
+		if err != nil {
+			return err
+		}
+		if role.Position >= actorRole.Position {
+			return repository.ErrForbidden
+		}
+
+		if err := roleRepo.Create(ctx, role); err != nil {
+			return err
+		}
+
+		payload, err := json.Marshal(
+			map[string]interface{}{
+				"role_id": role.ID,
+				"name":    role.Name,
+			},
+		)
+		if err != nil {
+			return err
+		}
+
+		event := &model.Event{
+			ActorID:   &actorID,
+			EventType: "ROLE_CREATED",
+			Payload:   payload,
+		}
+
+		return eventRepo.Create(ctx, event)
 	})
 }
