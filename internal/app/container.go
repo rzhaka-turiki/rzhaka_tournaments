@@ -26,6 +26,14 @@ func NewContainer(db *pgxpool.Pool) *Container {
 	roleService := service.NewRoleService(txManager, roleRepository, eventRepository)
 	permissionRepository := repository.NewPermissionRepository(db)
 	permissionService := service.NewPermissionService(permissionRepository)
+	rolePermissionRepository := repository.NewRolePermissionRepository(db)
+	rolePermissionService := service.NewRolePermissionService(
+		txManager,
+		roleRepository,
+		permissionRepository,
+		rolePermissionRepository,
+		eventRepository,
+	)
 
 	return &Container{
 		Repositories: Repositories{
@@ -35,9 +43,10 @@ func NewContainer(db *pgxpool.Pool) *Container {
 			Permission: permissionRepository,
 		},
 		Services: Services{
-			User:       userService,
-			Role:       roleService,
-			Permission: permissionService,
+			User:           userService,
+			Role:           roleService,
+			Permission:     permissionService,
+			RolePermission: rolePermissionService,
 		},
 	}
 }

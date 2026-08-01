@@ -23,3 +23,7 @@ func FromPermissions(permissions []model.Permission) []PermissionResponse {
 	}
 	return PermissionsResponse
 }
+
+type AddPermissionRequest struct {
+	PermissionID int `json:"permission_id" binding:"required"`
+}

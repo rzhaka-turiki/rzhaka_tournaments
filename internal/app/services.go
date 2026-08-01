@@ -6,4 +6,6 @@ type Services struct {
 	User       service.UserService
 	Role       service.RoleService
 	Permission service.PermissionService
+
+	RolePermission service.RolePermissionService
 }

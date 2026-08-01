@@ -61,6 +61,7 @@ func (h *RoleHandler) AssignRole(c *gin.Context) {
 		HandleError(c, err)
 		return
 	}
+	// change after JWT add
 	actorID := userID
 	err = h.roleService.AssignRole(c.Request.Context(), actorID, userID, req.RoleID)
 	if err != nil {
@@ -81,6 +82,7 @@ func (h *RoleHandler) RemoveRole(c *gin.Context) {
 		HandleError(c, err)
 		return
 	}
+	// change after JWT add
 	actorID := userID
 	err = h.roleService.RemoveRole(c.Request.Context(), actorID, userID, roleID)
 	if err != nil {
@@ -115,6 +117,7 @@ func (h *RoleHandler) CreateRole(c *gin.Context) {
 		HandleError(c, err)
 		return
 	}
+	// change after JWT add
 	actorID := uuid.MustParse("test_val")
 	role := &model.Role{
 		Name:      req.Name,
@@ -137,6 +140,7 @@ func (h *RoleHandler) DeleteRole(c *gin.Context) {
 		response.Fail(c, http.StatusBadRequest, "INVALID_ID", "invalid role id")
 		return
 	}
+	// change after JWT add
 	actorID := uuid.MustParse("test_val")
 	err = h.roleService.DeleteRole(c.Request.Context(), actorID, roleID)
 	if err != nil {
@@ -151,6 +155,7 @@ func (h *RoleHandler) RestoreRole(c *gin.Context) {
 		response.Fail(c, http.StatusBadRequest, "INVALID_ID", "invalid role id")
 		return
 	}
+	// change after JWT add
 	actorID := uuid.MustParse("test_val")
 	err = h.roleService.RestoreRole(c.Request.Context(), actorID, roleID)
 	if err != nil {
