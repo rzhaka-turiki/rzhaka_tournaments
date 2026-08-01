@@ -12,6 +12,7 @@ type PermissionRepository interface {
 	GetAll(ctc context.Context) ([]model.Permission, error)
 	GetByID(ctx context.Context, ID int) (*model.Permission, error)
 	GetByCode(ctx context.Context, code string) (*model.Permission, error)
+	Exists(ctx context.Context, id int) (bool, error)
 }
 
 type permissionRepository struct {
@@ -103,4 +104,20 @@ func (r *permissionRepository) GetByCode(ctx context.Context, code string) (*mod
 		return nil, err
 	}
 	return &permission, nil
+}
+
+func (r *permissionRepository) Exists(ctx context.Context, id int) (bool, error) {
+	query := `
+	SELECT EXISTS(
+		SELECT 1
+		FROM permissions
+		WHERE id=$1
+		AND deleted_at IS NULL
+	)
+	`
+
+	var exists bool
+
+	err := r.db.QueryRow(ctx, query, id).Scan(&exists)
+	return exists, err
 }

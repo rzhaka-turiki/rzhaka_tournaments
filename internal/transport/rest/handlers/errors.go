@@ -26,6 +26,7 @@ func HandleError(c *gin.Context, err error) {
 	case errors.Is(err, repository.ErrUnauthorized):
 		response.Fail(c, http.StatusUnauthorized, "UNAUTHORIZED", err.Error())
 	default:
+		//log.Println("handler error:", err)
 		response.Fail(c, http.StatusInternalServerError, "INTERNAL_ERROR", "internal server error")
 	}
 }

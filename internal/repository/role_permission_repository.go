@@ -64,8 +64,14 @@ func (r *rolePermissionRepository) AddPermission(ctx context.Context, roleID int
 	VALUES($1,$2)
 	ON CONFLICT DO NOTHING
 	`
-	_, err := r.db.Exec(ctx, query, roleID, permissionID)
-	return err
+	cmd, err := r.db.Exec(ctx, query, roleID, permissionID)
+	if err != nil {
+		return err
+	}
+	if cmd.RowsAffected() == 0 {
+		return ErrConflict
+	}
+	return nil
 }
 
 func (r *rolePermissionRepository) RemovePermission(ctx context.Context, roleID int, permissionID int) error {
@@ -74,7 +80,13 @@ func (r *rolePermissionRepository) RemovePermission(ctx context.Context, roleID 
 	WHERE role_id=$1
 	AND permission_id=$2
 	`
-	_, err := r.db.Exec(ctx, query, roleID, permissionID)
+	cmd, err := r.db.Exec(ctx, query, roleID, permissionID)
+	if err != nil {
+		return err
+	}
+	if cmd.RowsAffected() == 0 {
+		return ErrNotFound
+	}
 
-	return err
+	return nil
 }

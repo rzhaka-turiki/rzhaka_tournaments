@@ -62,6 +62,13 @@ func (s *rolePermissionService) AddPermission(ctx context.Context, actorID uuid.
 		if err := CanManageRole(ctx, roleRepo, actorID, role); err != nil {
 			return err
 		}
+		permissionExists, err := s.permissionRepository.Exists(ctx, permissionID)
+		if err != nil {
+			return err
+		}
+		if !permissionExists {
+			return repository.ErrNotFound
+		}
 		perm, err := permissionRepo.GetByID(ctx, permissionID)
 		if err != nil {
 			return err
