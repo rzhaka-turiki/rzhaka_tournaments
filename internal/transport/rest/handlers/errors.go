@@ -23,6 +23,8 @@ func HandleError(c *gin.Context, err error) {
 	case errors.Is(err, repository.ErrInvalid):
 		response.Fail(c, http.StatusBadRequest, "INVALID_DATA", err.Error())
 
+	case errors.Is(err, repository.ErrUnauthorized):
+		response.Fail(c, http.StatusUnauthorized, "UNAUTHORIZED", err.Error())
 	default:
 		response.Fail(c, http.StatusInternalServerError, "INTERNAL_ERROR", "internal server error")
 	}

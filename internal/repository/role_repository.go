@@ -44,7 +44,7 @@ func (r *roleRepository) GetUserRoles(ctx context.Context, userID uuid.UUID) ([]
 		SELECT
 			r.id,
 			r.name,
-			r.role_color
+			r.role_color,
 			r.deleted_at
 		FROM roles r
 		JOIN user_roles ur
@@ -65,6 +65,7 @@ func (r *roleRepository) GetUserRoles(ctx context.Context, userID uuid.UUID) ([]
 			&role.ID,
 			&role.Name,
 			&role.RoleColor,
+			&role.DeletedAt,
 		)
 		if err != nil {
 			return nil, err
@@ -102,14 +103,14 @@ func (r *roleRepository) GetRoleByID(ctx context.Context, id int) (*model.Role, 
 		SELECT
 			id,
 			name,
-			role_color
+			role_color,
 			deleted_at
 		FROM roles
 		WHERE id = $1
 		AND deleted_at IS NULL
 	`
 	var role model.Role
-	err := r.db.QueryRow(ctx, query, id).Scan(&role.ID, &role.Name, &role.RoleColor)
+	err := r.db.QueryRow(ctx, query, id).Scan(&role.ID, &role.Name, &role.RoleColor, &role.DeletedAt)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, ErrNotFound
@@ -181,7 +182,7 @@ func (r *roleRepository) GetHighestUserRole(ctx context.Context, userID uuid.UUI
 			r.role_color,
 			r.position,
 			r.is_system,
-			r.created_at
+			r.created_at,
 			r.deleted_at
 		FROM roles r
 		JOIN user_roles ur
@@ -199,6 +200,7 @@ func (r *roleRepository) GetHighestUserRole(ctx context.Context, userID uuid.UUI
 		&role.Position,
 		&role.IsSystem,
 		&role.CreatedAt,
+		&role.DeletedAt,
 	)
 	if err != nil {
 		return nil, err
@@ -212,7 +214,7 @@ func (r *roleRepository) GetAllRoles(ctx context.Context) ([]model.Role, error) 
     	id,
     	name,
     	position,
-    	role_color
+    	role_color,
 		deleted_at
 	FROM roles
 	WHERE deleted_at IS NULL
@@ -247,7 +249,7 @@ func (r *roleRepository) GetAllPermissions(ctx context.Context) ([]model.Permiss
 	SELECT
     	id,
     	code, 
-    	description
+    	description,
 		deleted_at
 	FROM permissions
 	WHERE deleted_at IS NULL

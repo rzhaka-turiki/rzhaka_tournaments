@@ -6,6 +6,7 @@ import (
 	"github.com/a1uka/rzhaka_tournaments/internal/config"
 	"github.com/a1uka/rzhaka_tournaments/internal/database"
 	"github.com/a1uka/rzhaka_tournaments/internal/transport/rest"
+	"github.com/a1uka/rzhaka_tournaments/internal/transport/rest/auth"
 	"github.com/a1uka/rzhaka_tournaments/internal/transport/rest/handlers"
 	"github.com/a1uka/rzhaka_tournaments/internal/transport/rest/middleware"
 	"github.com/a1uka/rzhaka_tournaments/internal/transport/rest/routes"
@@ -37,6 +38,7 @@ func New() (*App, error) {
 		middleware.RequestID(),
 		middleware.Logger(),
 		middleware.Recovery(),
+		auth.MockAuth(),
 	)
 
 	// container w/ handlers

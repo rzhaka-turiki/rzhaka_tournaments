@@ -5,7 +5,9 @@ import (
 	"strconv"
 
 	"github.com/a1uka/rzhaka_tournaments/internal/model"
+	"github.com/a1uka/rzhaka_tournaments/internal/repository"
 	"github.com/a1uka/rzhaka_tournaments/internal/service"
+	"github.com/a1uka/rzhaka_tournaments/internal/transport/rest/auth"
 	"github.com/a1uka/rzhaka_tournaments/internal/transport/rest/dto"
 	"github.com/a1uka/rzhaka_tournaments/internal/transport/rest/response"
 	"github.com/gin-gonic/gin"
@@ -62,7 +64,11 @@ func (h *RoleHandler) AssignRole(c *gin.Context) {
 		return
 	}
 	// change after JWT add
-	actorID := userID
+	actorID := auth.UserID(c)
+	if actorID == uuid.Nil {
+		HandleError(c, repository.ErrUnauthorized)
+		return
+	}
 	err = h.roleService.AssignRole(c.Request.Context(), actorID, userID, req.RoleID)
 	if err != nil {
 		HandleError(c, err)
@@ -83,7 +89,11 @@ func (h *RoleHandler) RemoveRole(c *gin.Context) {
 		return
 	}
 	// change after JWT add
-	actorID := userID
+	actorID := auth.UserID(c)
+	if actorID == uuid.Nil {
+		HandleError(c, repository.ErrUnauthorized)
+		return
+	}
 	err = h.roleService.RemoveRole(c.Request.Context(), actorID, userID, roleID)
 	if err != nil {
 		HandleError(c, err)
@@ -141,7 +151,11 @@ func (h *RoleHandler) DeleteRole(c *gin.Context) {
 		return
 	}
 	// change after JWT add
-	actorID := uuid.MustParse("test_val")
+	actorID := auth.UserID(c)
+	if actorID == uuid.Nil {
+		HandleError(c, repository.ErrUnauthorized)
+		return
+	}
 	err = h.roleService.DeleteRole(c.Request.Context(), actorID, roleID)
 	if err != nil {
 		HandleError(c, err)
@@ -156,7 +170,11 @@ func (h *RoleHandler) RestoreRole(c *gin.Context) {
 		return
 	}
 	// change after JWT add
-	actorID := uuid.MustParse("test_val")
+	actorID := auth.UserID(c)
+	if actorID == uuid.Nil {
+		HandleError(c, repository.ErrUnauthorized)
+		return
+	}
 	err = h.roleService.RestoreRole(c.Request.Context(), actorID, roleID)
 	if err != nil {
 		HandleError(c, err)
