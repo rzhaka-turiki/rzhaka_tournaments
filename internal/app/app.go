@@ -42,9 +42,10 @@ func New() (*App, error) {
 	// container w/ handlers
 	container := NewContainer(db)
 	restHandlers := rest.Handlers{
-		Health: handlers.NewHealthHandler(db),
-		User:   handlers.NewUserHandler(container.Services.User),
-		Role:   handlers.NewRoleHandler(container.Services.Role),
+		Health:     handlers.NewHealthHandler(db),
+		User:       handlers.NewUserHandler(container.Services.User),
+		Role:       handlers.NewRoleHandler(container.Services.Role),
+		Permission: handlers.NewPermissionHandler(container.Repositories.Permission),
 	}
 	routes.RegisterRoutes(router, &restHandlers)
 

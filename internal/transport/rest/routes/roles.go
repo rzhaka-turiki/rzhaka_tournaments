@@ -10,10 +10,8 @@ func registerRoles(router *gin.RouterGroup, roleHandler *handlers.RoleHandler) {
 	{
 		roles.POST("", roleHandler.CreateRole)
 		roles.GET("", roleHandler.GetAllRoles)
-	}
-	permissions := router.Group("/permissions")
-	{
-		permissions.GET("", roleHandler.GetAllPermissions)
+		roles.DELETE("/:id", roleHandler.DeleteRole)
+		roles.PATCH(":id/restore", roleHandler.RestoreRole)
 	}
 	users := router.Group("/users")
 	{

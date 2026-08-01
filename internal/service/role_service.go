@@ -6,6 +6,7 @@ import (
 
 	"github.com/a1uka/rzhaka_tournaments/internal/database"
 	"github.com/a1uka/rzhaka_tournaments/internal/model"
+	"github.com/a1uka/rzhaka_tournaments/internal/permission"
 	"github.com/a1uka/rzhaka_tournaments/internal/repository"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
@@ -18,8 +19,14 @@ type RoleService interface {
 	GetAllPermissions(ctx context.Context) ([]model.Permission, error)
 	AssignRole(ctx context.Context, actorID uuid.UUID, targetUserID uuid.UUID, roleID int) error
 	RemoveRole(ctx context.Context, actorID uuid.UUID, targetUserID uuid.UUID, roleID int) error
+	//GetRolePermissions(ctx context.Context, roleID int) ([]model.Permission, error)
 
+	//AddRolePermission(ctx context.Context, actorID uuid.UUID, roleID int, permissionID int) error
 	CreateRole(ctx context.Context, actorID uuid.UUID, role *model.Role) error
+
+	//RemoveRolePermission(ctx context.Context, actorID uuid.UUID, roleID int, permissionID int) error
+	DeleteRole(ctx context.Context, actorID uuid.UUID, roleID int) error
+	RestoreRole(ctx context.Context, actorID uuid.UUID, roleID int) error
 }
 
 type roleService struct {
@@ -174,7 +181,7 @@ func (s *roleService) CreateRole(ctx context.Context, actorID uuid.UUID, role *m
 		roleRepo := repository.NewRoleRepository(tx)
 		eventRepo := repository.NewEventRepository(tx)
 
-		if err := s.hasPermission(ctx, roleRepo, actorID, "role.create"); err != nil {
+		if err := s.hasPermission(ctx, roleRepo, actorID, permission.RoleCreate); err != nil {
 			return err
 		}
 
@@ -207,5 +214,72 @@ func (s *roleService) CreateRole(ctx context.Context, actorID uuid.UUID, role *m
 		}
 
 		return eventRepo.Create(ctx, event)
+	})
+}
+
+func (s *roleService) DeleteRole(ctx context.Context, actorID uuid.UUID, roleID int) error {
+	return s.txManager.WithinTransaction(ctx, func(tx pgx.Tx) error {
+		roleRepo := repository.NewRoleRepository(tx)
+		eventRepo := repository.NewEventRepository(tx)
+
+		if err := s.hasPermission(ctx, roleRepo, actorID, permission.RoleDelete); err != nil {
+			return err
+		}
+		role, err := roleRepo.GetRoleByID(ctx, roleID)
+		if err != nil {
+			return err
+		}
+		if role.IsSystem {
+			return repository.ErrForbidden
+		}
+		if err := s.canManageRole(ctx, roleRepo, actorID, role); err != nil {
+			return err
+		}
+		if err := roleRepo.SoftDelete(ctx, roleID, actorID); err != nil {
+			return err
+		}
+		payload, _ := json.Marshal(
+			map[string]interface{}{
+				"role_id": roleID,
+				"name":    role.Name,
+			},
+		)
+		return eventRepo.Create(ctx, &model.Event{
+			ActorID:   &actorID,
+			EventType: "ROLE_DELETED",
+			Payload:   payload,
+		})
+	})
+}
+
+func (s *roleService) RestoreRole(ctx context.Context, actorID uuid.UUID, roleID int) error {
+	return s.txManager.WithinTransaction(ctx, func(tx pgx.Tx) error {
+		roleRepo := repository.NewRoleRepository(tx)
+		eventRepo := repository.NewEventRepository(tx)
+
+		if err := s.hasPermission(ctx, roleRepo, actorID, permission.RoleRestore); err != nil {
+			return err
+		}
+		role, err := roleRepo.GetRoleByIDIncludeDeleted(ctx, roleID)
+		if err != nil {
+			return err
+		}
+		if err := s.canManageRole(ctx, roleRepo, actorID, role); err != nil {
+			return err
+		}
+		if err := roleRepo.Restore(ctx, roleID); err != nil {
+			return err
+		}
+		payload, _ := json.Marshal(
+			map[string]interface{}{
+				"role_id": roleID,
+				"name":    role.Name,
+			},
+		)
+		return eventRepo.Create(ctx, &model.Event{
+			ActorID:   &actorID,
+			EventType: "ROLE_RESTORED",
+			Payload:   payload,
+		})
 	})
 }

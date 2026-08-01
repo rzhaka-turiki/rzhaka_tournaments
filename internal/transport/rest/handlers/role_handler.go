@@ -130,3 +130,32 @@ func (h *RoleHandler) CreateRole(c *gin.Context) {
 	}
 	response.Success(c, http.StatusCreated, dto.FromRole(*role))
 }
+
+func (h *RoleHandler) DeleteRole(c *gin.Context) {
+	roleID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		response.Fail(c, http.StatusBadRequest, "INVALID_ID", "invalid role id")
+		return
+	}
+	actorID := uuid.MustParse("test_val")
+	err = h.roleService.DeleteRole(c.Request.Context(), actorID, roleID)
+	if err != nil {
+		HandleError(c, err)
+		return
+	}
+}
+
+func (h *RoleHandler) RestoreRole(c *gin.Context) {
+	roleID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		response.Fail(c, http.StatusBadRequest, "INVALID_ID", "invalid role id")
+		return
+	}
+	actorID := uuid.MustParse("test_val")
+	err = h.roleService.RestoreRole(c.Request.Context(), actorID, roleID)
+	if err != nil {
+		HandleError(c, err)
+		return
+	}
+	c.Status(http.StatusNoContent)
+}

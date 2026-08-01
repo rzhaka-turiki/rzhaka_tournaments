@@ -1,22 +1,29 @@
 package model
 
-import "time"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type Role struct {
-	ID        int
-	Name      string
-	RoleColor string
+	ID        int    `json:"id"`
+	Name      string `json:"name"`
+	RoleColor string `json:"role_color"`
 	// higher pos - higher role
-	Position int
+	Position int `json:"position"`
 	// cant be deleted
-	IsSystem  bool
-	CreatedAt time.Time
+	IsSystem  bool       `json:"system"`
+	CreatedAt time.Time  `json:"created_at"`
+	DeletedAt *time.Time `json:"deleted_at,omitempty"`
+	DeletedBy *uuid.UUID `json:"deleted_by,omitempty"`
 }
 
 type Permission struct {
-	ID          int
-	Code        string
-	Description string
+	ID          int       `json:"id"`
+	Code        string    `json:"code"`
+	Description string    `json:"description"`
+	CreatedAt   time.Time `json:"created_at"`
 }
 
 type RolePermission struct {
