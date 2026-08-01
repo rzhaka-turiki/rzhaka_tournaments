@@ -29,28 +29,12 @@ type RoleRepository interface {
 	Restore(ctx context.Context, roleID int) error
 }
 
-type RolePermissionRepository interface {
-	GetRolePermissions(ctx context.Context, roleID int) ([]model.Permission, error)
-	Add(ctx context.Context, roleID int, permissionID int) error
-	Remove(ctx context.Context, roleID int, permissionID int) error
-}
-
 type roleRepository struct {
-	db DBTX
-}
-
-type rolePermissionRepository struct {
 	db DBTX
 }
 
 func NewRoleRepository(db DBTX) RoleRepository {
 	return &roleRepository{
-		db: db,
-	}
-}
-
-func NewRolePermissionRepository(db DBTX) RolePermissionRepository {
-	return &rolePermissionRepository{
 		db: db,
 	}
 }
@@ -377,61 +361,4 @@ func (r *roleRepository) GetRoleByIDIncludeDeleted(ctx context.Context, ID int) 
 		return nil, err
 	}
 	return &role, nil
-}
-
-func (r *rolePermissionRepository) GetRolePermissions(ctx context.Context, roleID int) ([]model.Permission, error) {
-	query := `
-	SELECT
-		p.id,
-		p.code,
-		p.description
-	FROM permissions p
-	JOIN role_permissions rp
-	ON rp.permission_id = p.id
-	WHERE rp.role_id = $1
-	ORDER BY p.id
-	`
-	rows, err := r.db.Query(ctx, query, roleID)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var permissions []model.Permission
-	for rows.Next() {
-		var permission model.Permission
-		err := rows.Scan(
-			&permission.ID,
-			&permission.Code,
-			&permission.Description,
-		)
-		if err != nil {
-			return nil, err
-		}
-		permissions = append(permissions, permission)
-	}
-	return permissions, rows.Err()
-}
-
-func (r *rolePermissionRepository) Add(ctx context.Context, roleID int, permissionID int) error {
-	query := `
-	INSERT INTO role_permissions(
-		role_id,
-		permission_id
-	)
-	VALUES($1,$2)
-	ON CONFLICT DO NOTHING
-	`
-	_, err := r.db.Exec(ctx, query, roleID, permissionID)
-	return err
-}
-
-func (r *rolePermissionRepository) Remove(ctx context.Context, roleID int, permissionID int) error {
-	query := `
-	DELETE FROM role_permissions
-	WHERE role_id=$1
-	AND permission_id=$2
-	`
-	_, err := r.db.Exec(ctx, query, roleID, permissionID)
-
-	return err
 }
