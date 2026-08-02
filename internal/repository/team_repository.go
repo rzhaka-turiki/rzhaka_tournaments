@@ -353,20 +353,12 @@ func (r *teamRepository) UpdateOwner(ctx context.Context, teamID uuid.UUID, owne
 	WHERE id = $2
 	`
 
-	result, err := r.db.Exec(
-		ctx,
-		query,
-		ownerID,
-		teamID,
-	)
-
+	result, err := r.db.Exec(ctx, query, ownerID, teamID)
 	if err != nil {
 		return err
 	}
-
 	if result.RowsAffected() == 0 {
 		return ErrNotFound
 	}
-
 	return nil
 }
