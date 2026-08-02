@@ -38,7 +38,7 @@ func New() (*App, error) {
 		middleware.RequestID(),
 		middleware.Logger(),
 		middleware.Recovery(),
-		auth.MockAuth(),
+		auth.Middleware(),
 	)
 
 	// container w/ handlers

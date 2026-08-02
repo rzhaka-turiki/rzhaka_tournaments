@@ -6,7 +6,7 @@ CREATE TABLE events (
     tournament_id UUID,
     event_type TEXT NOT NULL,
     payload JSONB,
-    created_at TIMESTAMP NOT NULL DEFAULT NOW()
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 
