@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/a1uka/rzhaka_tournaments/internal/service"
+	"github.com/a1uka/rzhaka_tournaments/internal/transport/rest/auth"
 	"github.com/a1uka/rzhaka_tournaments/internal/transport/rest/dto"
 	"github.com/a1uka/rzhaka_tournaments/internal/transport/rest/response"
 	"github.com/gin-gonic/gin"
@@ -37,4 +38,14 @@ func (h *UserHandler) GetByID(c *gin.Context) {
 		return
 	}
 	response.Success(c, http.StatusOK, dto.FromUser(user))
+}
+
+func (h *UserHandler) Me(c *gin.Context) {
+	actorID := auth.UserID(c)
+	me, err := h.userService.GetMe(c.Request.Context(), actorID)
+	if err != nil {
+		HandleError(c, err)
+		return
+	}
+	response.Success(c, http.StatusOK, me)
 }

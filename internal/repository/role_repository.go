@@ -45,6 +45,7 @@ func (r *roleRepository) GetUserRoles(ctx context.Context, userID uuid.UUID) ([]
 			r.id,
 			r.name,
 			r.role_color,
+			r.position,
 			r.deleted_at
 		FROM roles r
 		JOIN user_roles ur
@@ -65,6 +66,7 @@ func (r *roleRepository) GetUserRoles(ctx context.Context, userID uuid.UUID) ([]
 			&role.ID,
 			&role.Name,
 			&role.RoleColor,
+			&role.Position,
 			&role.DeletedAt,
 		)
 		if err != nil {

@@ -197,12 +197,9 @@ func (s *roleService) DeleteRole(ctx context.Context, actorID uuid.UUID, roleID 
 		if err := CheckPermission(ctx, roleRepo, actorID, permission.RoleDelete); err != nil {
 			return err
 		}
-		role, err := roleRepo.GetRoleByID(ctx, roleID)
+		role, err := s.ensureRoleEditable(ctx, roleID)
 		if err != nil {
 			return err
-		}
-		if role.IsSystem {
-			return repository.ErrForbidden
 		}
 		if err := CanManageRole(ctx, roleRepo, actorID, role); err != nil {
 			return err
@@ -236,6 +233,10 @@ func (s *roleService) RestoreRole(ctx context.Context, actorID uuid.UUID, roleID
 		if err != nil {
 			return err
 		}
+		role, err = s.ensureRoleEditable(ctx, roleID)
+		if err != nil {
+			return err
+		}
 		if err := CanManageRole(ctx, roleRepo, actorID, role); err != nil {
 			return err
 		}
@@ -254,4 +255,15 @@ func (s *roleService) RestoreRole(ctx context.Context, actorID uuid.UUID, roleID
 			Payload:   payload,
 		})
 	})
+}
+
+func (s *roleService) ensureRoleEditable(ctx context.Context, roleID int) (*model.Role, error) {
+	role, err := s.roleRepository.GetRoleByID(ctx, roleID)
+	if err != nil {
+		return nil, err
+	}
+	if role.IsSystem {
+		return nil, repository.ErrForbidden
+	}
+	return role, nil
 }

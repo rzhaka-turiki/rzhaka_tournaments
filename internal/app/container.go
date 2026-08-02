@@ -20,13 +20,14 @@ type Container struct {
 func NewContainer(db *pgxpool.Pool) *Container {
 	txManager := database.NewTxManager(db)
 	userRepository := repository.NewUserRepository(db)
-	userService := service.NewUserService(userRepository)
 	roleRepository := repository.NewRoleRepository(db)
 	eventRepository := repository.NewEventRepository(db)
-	roleService := service.NewRoleService(txManager, roleRepository, eventRepository)
 	permissionRepository := repository.NewPermissionRepository(db)
-	permissionService := service.NewPermissionService(permissionRepository)
 	rolePermissionRepository := repository.NewRolePermissionRepository(db)
+
+	userService := service.NewUserService(userRepository, roleRepository)
+	roleService := service.NewRoleService(txManager, roleRepository, eventRepository)
+	permissionService := service.NewPermissionService(permissionRepository)
 	rolePermissionService := service.NewRolePermissionService(
 		txManager,
 		roleRepository,

@@ -24,3 +24,9 @@ func FromUser(user *model.User) UserResponse {
 		CreatedAt: user.CreatedAt,
 	}
 }
+
+type MeResponse struct {
+	ID          uuid.UUID      `json:"id"`
+	Roles       []RoleResponse `json:"roles"`
+	Permissions []string       `json:"permissions"`
+}

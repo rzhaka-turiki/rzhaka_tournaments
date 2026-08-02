@@ -29,7 +29,7 @@ func FromRole(role model.Role) RoleResponse {
 }
 
 func FromRoles(roles []model.Role) []RoleResponse {
-	var RolesResponse []RoleResponse
+	RolesResponse := make([]RoleResponse, 0, len(roles))
 	for _, role := range roles {
 		RolesResponse = append(RolesResponse, FromRole(role))
 	}

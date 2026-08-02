@@ -8,6 +8,7 @@ import (
 func registerUsers(router *gin.RouterGroup, handler *handlers.UserHandler) {
 	users := router.Group("/users")
 	{
-		users.GET(":id", handler.GetByID)
+		users.GET("/me", handler.Me)
+		users.GET("/:id", handler.GetByID)
 	}
 }
