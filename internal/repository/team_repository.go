@@ -17,6 +17,7 @@ type TeamRepository interface {
 	Archive(ctx context.Context, teamID uuid.UUID) error
 	Restore(ctx context.Context, teamID uuid.UUID) error
 	Update(ctx context.Context, team *model.Team) error
+	UpdateOwner(ctx context.Context, teamID, ownerID uuid.UUID) error
 }
 
 type teamRepository struct {
@@ -332,6 +333,31 @@ func (r *teamRepository) Update(ctx context.Context, team *model.Team) error {
 		team.LogoPath,
 		team.LogoDarkPath,
 		team.ID,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	if result.RowsAffected() == 0 {
+		return ErrNotFound
+	}
+
+	return nil
+}
+
+func (r *teamRepository) UpdateOwner(ctx context.Context, teamID uuid.UUID, ownerID uuid.UUID) error {
+	query := `
+	UPDATE teams
+	SET owner_id = $1
+	WHERE id = $2
+	`
+
+	result, err := r.db.Exec(
+		ctx,
+		query,
+		ownerID,
+		teamID,
 	)
 
 	if err != nil {
