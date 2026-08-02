@@ -16,6 +16,7 @@ type TeamRepository interface {
 	IsOwner(ctx context.Context, teamID uuid.UUID, userID uuid.UUID) (bool, error)
 	Archive(ctx context.Context, teamID uuid.UUID) error
 	Restore(ctx context.Context, teamID uuid.UUID) error
+	Update(ctx context.Context, team *model.Team) error
 }
 
 type teamRepository struct {
@@ -309,5 +310,37 @@ func (r *teamRepository) RemoveMember(ctx context.Context, teamID uuid.UUID, use
 	if result.RowsAffected() == 0 {
 		return ErrNotFound
 	}
+	return nil
+}
+
+func (r *teamRepository) Update(ctx context.Context, team *model.Team) error {
+	query := `
+	UPDATE teams
+	SET
+		name = $1,
+		short_name = $2,
+		logo_path = $3,
+		logo_dark_path = $4
+	WHERE id = $5
+	`
+
+	result, err := r.db.Exec(
+		ctx,
+		query,
+		team.Name,
+		team.ShortName,
+		team.LogoPath,
+		team.LogoDarkPath,
+		team.ID,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	if result.RowsAffected() == 0 {
+		return ErrNotFound
+	}
+
 	return nil
 }

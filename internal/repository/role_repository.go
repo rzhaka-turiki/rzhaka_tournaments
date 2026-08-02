@@ -27,6 +27,7 @@ type RoleRepository interface {
 	Create(ctx context.Context, role *model.Role) error
 	SoftDelete(ctx context.Context, roleID int, deletedBy uuid.UUID) error
 	Restore(ctx context.Context, roleID int) error
+	Update(ctx context.Context, role *model.Role) error
 }
 
 type roleRepository struct {
@@ -339,7 +340,7 @@ func (r *roleRepository) GetRoleByIDIncludeDeleted(ctx context.Context, ID int) 
 			name,
 			position,
 			role_color,
-			system,
+			is_system,
 			created_at,
 			deleted_at,
 			deleted_by
@@ -365,4 +366,32 @@ func (r *roleRepository) GetRoleByIDIncludeDeleted(ctx context.Context, ID int) 
 		return nil, err
 	}
 	return &role, nil
+}
+
+func (r *roleRepository) Update(ctx context.Context, role *model.Role) error {
+	query := `
+		UPDATE roles
+		SET
+			name = $1,
+			position = $2,
+			role_color = $3,
+			is_system = $4,
+			updated_at = NOW()
+		WHERE id = $5
+	`
+	cmd, err := r.db.Exec(ctx,
+		query,
+		role.Name,
+		role.Position,
+		role.RoleColor,
+		role.IsSystem,
+		role.ID,
+	)
+	if err != nil {
+		return err
+	}
+	if cmd.RowsAffected() == 0 {
+		return ErrNotFound
+	}
+	return err
 }

@@ -12,6 +12,7 @@ type TeamMemberRepository interface {
 	Create(ctx context.Context, member *model.TeamMember) error
 	Remove(ctx context.Context, teamID, userID uuid.UUID) error
 	Exists(ctx context.Context, teamID, userID uuid.UUID) (bool, error)
+	UpdateRole(ctx context.Context, teamID, userID uuid.UUID, role string) error
 }
 
 type teamMemberRepository struct {
@@ -101,6 +102,27 @@ func (r *teamMemberRepository) Remove(ctx context.Context, teamID uuid.UUID, use
 	`
 
 	result, err := r.db.Exec(ctx, query, teamID, userID)
+	if err != nil {
+		return err
+	}
+
+	if result.RowsAffected() == 0 {
+		return ErrNotFound
+	}
+
+	return nil
+}
+
+func (r *teamMemberRepository) UpdateRole(ctx context.Context, teamID, userID uuid.UUID, role string) error {
+	query := `
+	UPDATE team_members
+	SET role = $1
+	WHERE team_id = $2
+	  AND user_id = $3
+	`
+
+	result, err := r.db.Exec(ctx, query, role, teamID, userID)
+
 	if err != nil {
 		return err
 	}
