@@ -26,7 +26,18 @@ func Connect(databaseURL string) (*pgxpool.Pool, error) {
 	if err != nil {
 		return nil, fmt.Errorf("create postgres pool: %w", err)
 	}
+	var addr string
 
+	err = pool.QueryRow(
+		ctx,
+		"SELECT COALESCE(inet_client_addr()::text, 'socket')",
+	).Scan(&addr)
+
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Println("PG CLIENT ADDR:", addr)
 	if err := pool.Ping(ctx); err != nil {
 		pool.Close()
 		return nil, fmt.Errorf("ping postgres: %w", err)

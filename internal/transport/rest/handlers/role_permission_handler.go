@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/a1uka/rzhaka_tournaments/internal/repository"
 	"github.com/a1uka/rzhaka_tournaments/internal/service"
 	"github.com/a1uka/rzhaka_tournaments/internal/transport/rest/auth"
 	"github.com/a1uka/rzhaka_tournaments/internal/transport/rest/dto"
@@ -52,7 +51,7 @@ func (h *RolePermissionHandler) AddPermission(c *gin.Context) {
 	// change after JWT add
 	actorID := auth.UserID(c)
 	if actorID == uuid.Nil {
-		HandleError(c, repository.ErrUnauthorized)
+		HandleError(c, service.ErrUnauthorized)
 		return
 	}
 	err = h.rolePermissionService.AddPermission(c.Request.Context(), actorID, roleID, req.PermissionID)
@@ -77,7 +76,7 @@ func (h *RolePermissionHandler) RemovePermission(c *gin.Context) {
 	// change after JWT add
 	actorID := auth.UserID(c)
 	if actorID == uuid.Nil {
-		HandleError(c, repository.ErrUnauthorized)
+		HandleError(c, service.ErrUnauthorized)
 		return
 	}
 	err = h.rolePermissionService.RemovePermission(c.Request.Context(), actorID, roleID, permissionID)

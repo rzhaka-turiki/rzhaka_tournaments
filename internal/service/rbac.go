@@ -14,7 +14,7 @@ func CanManageRole(ctx context.Context, roleRepo repository.RoleRepository, acto
 		return err
 	}
 	if actorRole.Position <= role.Position {
-		return repository.ErrForbidden
+		return ErrForbidden
 	}
 	return nil
 }
@@ -25,7 +25,7 @@ func CheckPermission(ctx context.Context, repo repository.RoleRepository, userID
 		return err
 	}
 	if !ok {
-		return repository.ErrForbidden
+		return ErrForbidden
 	}
 	return nil
 }

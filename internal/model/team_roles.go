@@ -5,4 +5,5 @@ const (
 	TeamRolePlayer  = "PLAYER"
 	TeamRoleCoach   = "COACH"
 	TeamRoleAnalyst = "ANALYST"
+	TeamRoleOwner   = "OWNER"
 )

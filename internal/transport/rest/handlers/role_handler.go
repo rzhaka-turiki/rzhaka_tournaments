@@ -5,7 +5,6 @@ import (
 	"strconv"
 
 	"github.com/a1uka/rzhaka_tournaments/internal/model"
-	"github.com/a1uka/rzhaka_tournaments/internal/repository"
 	"github.com/a1uka/rzhaka_tournaments/internal/service"
 	"github.com/a1uka/rzhaka_tournaments/internal/transport/rest/auth"
 	"github.com/a1uka/rzhaka_tournaments/internal/transport/rest/dto"
@@ -66,7 +65,7 @@ func (h *RoleHandler) AssignRole(c *gin.Context) {
 	// change after JWT add
 	actorID := auth.UserID(c)
 	if actorID == uuid.Nil {
-		HandleError(c, repository.ErrUnauthorized)
+		HandleError(c, service.ErrUnauthorized)
 		return
 	}
 	err = h.roleService.AssignRole(c.Request.Context(), actorID, userID, req.RoleID)
@@ -91,7 +90,7 @@ func (h *RoleHandler) RemoveRole(c *gin.Context) {
 	// change after JWT add
 	actorID := auth.UserID(c)
 	if actorID == uuid.Nil {
-		HandleError(c, repository.ErrUnauthorized)
+		HandleError(c, service.ErrUnauthorized)
 		return
 	}
 	err = h.roleService.RemoveRole(c.Request.Context(), actorID, userID, roleID)
@@ -153,7 +152,7 @@ func (h *RoleHandler) DeleteRole(c *gin.Context) {
 	// change after JWT add
 	actorID := auth.UserID(c)
 	if actorID == uuid.Nil {
-		HandleError(c, repository.ErrUnauthorized)
+		HandleError(c, service.ErrUnauthorized)
 		return
 	}
 	err = h.roleService.DeleteRole(c.Request.Context(), actorID, roleID)
@@ -172,7 +171,7 @@ func (h *RoleHandler) RestoreRole(c *gin.Context) {
 	// change after JWT add
 	actorID := auth.UserID(c)
 	if actorID == uuid.Nil {
-		HandleError(c, repository.ErrUnauthorized)
+		HandleError(c, service.ErrUnauthorized)
 		return
 	}
 	err = h.roleService.RestoreRole(c.Request.Context(), actorID, roleID)

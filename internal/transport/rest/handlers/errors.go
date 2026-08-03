@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/a1uka/rzhaka_tournaments/internal/repository"
+	"github.com/a1uka/rzhaka_tournaments/internal/service"
 	"github.com/a1uka/rzhaka_tournaments/internal/transport/rest/response"
 	"github.com/gin-gonic/gin"
 )
@@ -14,7 +15,7 @@ func HandleError(c *gin.Context, err error) {
 	case errors.Is(err, repository.ErrNotFound):
 		response.Fail(c, http.StatusNotFound, "NOT_FOUND", err.Error())
 
-	case errors.Is(err, repository.ErrForbidden):
+	case errors.Is(err, service.ErrForbidden):
 		response.Fail(c, http.StatusForbidden, "FORBIDDEN", err.Error())
 
 	case errors.Is(err, repository.ErrConflict):
@@ -23,7 +24,7 @@ func HandleError(c *gin.Context, err error) {
 	case errors.Is(err, repository.ErrInvalid):
 		response.Fail(c, http.StatusBadRequest, "INVALID_DATA", err.Error())
 
-	case errors.Is(err, repository.ErrUnauthorized):
+	case errors.Is(err, service.ErrUnauthorized):
 		response.Fail(c, http.StatusUnauthorized, "UNAUTHORIZED", err.Error())
 	default:
 		//log.Println("handler error:", err)

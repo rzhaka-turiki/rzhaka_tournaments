@@ -16,5 +16,6 @@ func RegisterRoutes(
 		registerRoles(v1, h.Role)
 		registerPermissions(v1, h.Permission)
 		registerRolePermissions(v1, h.RolePermission)
+		registerTeams(v1, h.Team)
 	}
 }

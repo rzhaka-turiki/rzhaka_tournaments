@@ -162,7 +162,7 @@ func (s *roleService) CreateRole(ctx context.Context, actorID uuid.UUID, role *m
 			return err
 		}
 		if role.Position >= actorRole.Position {
-			return repository.ErrForbidden
+			return ErrForbidden
 		}
 
 		if err := roleRepo.Create(ctx, role); err != nil {
@@ -263,7 +263,7 @@ func (s *roleService) ensureRoleEditable(ctx context.Context, roleID int) (*mode
 		return nil, err
 	}
 	if role.IsSystem {
-		return nil, repository.ErrForbidden
+		return nil, ErrForbidden
 	}
 	return role, nil
 }

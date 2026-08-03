@@ -8,4 +8,5 @@ type Handlers struct {
 	Role           *handlers.RoleHandler
 	Permission     *handlers.PermissionHandler
 	RolePermission *handlers.RolePermissionHandler
+	Team           *handlers.TeamHandler
 }
