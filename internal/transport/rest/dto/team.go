@@ -29,7 +29,7 @@ type TeamResponse struct {
 }
 
 type UpdateTeamRequest struct {
-	Name         string  `json:"name" binding:"required"`
+	Name         *string `json:"name" binding:"required"`
 	ShortName    *string `json:"short_name"`
 	LogoPath     *string `json:"logo_path"`
 	LogoDarkPath *string `json:"logo_dark_path"`

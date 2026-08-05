@@ -105,28 +105,35 @@ func (h *TeamHandler) Update(c *gin.Context) {
 		response.Fail(c, http.StatusBadRequest, "INVALID_TEAM_ID", "invalid team id")
 		return
 	}
+
 	var req dto.UpdateTeamRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		response.Fail(c, http.StatusBadRequest, "INVALID_BODY", "invalid request body")
 		return
+	}
+	teamUPD := service.TeamUpdate{
+		Name:         req.Name,
+		ShortName:    req.ShortName,
+		LogoPath:     req.LogoPath,
+		LogoDarkPath: req.LogoDarkPath,
 	}
 	actorID := auth.UserID(c)
 	if actorID == uuid.Nil {
 		HandleError(c, service.ErrUnauthorized)
 		return
 	}
-	team := &model.Team{
-		ID:           teamID,
-		Name:         req.Name,
-		ShortName:    *req.ShortName,
-		LogoPath:     *req.LogoPath,
-		LogoDarkPath: *req.LogoDarkPath,
-	}
-	err = h.teamService.Update(c.Request.Context(), actorID, team)
+
+	err = h.teamService.Update(
+		c.Request.Context(),
+		actorID,
+		teamID,
+		teamUPD,
+	)
 	if err != nil {
 		HandleError(c, err)
 		return
 	}
+
 	response.Success(c, http.StatusNoContent, nil)
 }
 
