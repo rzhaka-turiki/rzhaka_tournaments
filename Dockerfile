@@ -14,7 +14,6 @@ RUN CGO_ENABLED=0 GOOS=linux go build \
 
 
 FROM alpine:latest
-
 WORKDIR /app
 
 COPY --from=builder /app/rzhaka-tournaments .
