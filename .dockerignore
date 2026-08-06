@@ -1,6 +1,10 @@
 .git
+.github
+.idea
 .vscode
+*.log
+.env
+tmp
 bin
-*.md
-Dockerfile
-.dockerignore
+dist
+docker-compose.yml
