@@ -17,7 +17,6 @@ FROM alpine:latest
 WORKDIR /app
 
 COPY --from=builder /app/rzhaka-tournaments .
-
 EXPOSE 8080
 
 CMD ["./rzhaka-tournaments"]
