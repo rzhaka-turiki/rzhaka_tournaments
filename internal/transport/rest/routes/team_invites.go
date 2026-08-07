@@ -13,7 +13,6 @@ func registerTeamRequests(
 	teams := rg.Group("/teams")
 	{
 		teams.POST("/:id/invitations", h.CreateInvite)
-
 		teams.GET("/:id/invitations", h.GetTeamInvitations)
 	}
 
@@ -25,7 +24,6 @@ func registerTeamRequests(
 	invitations := rg.Group("/invitations")
 	{
 		invitations.POST("/:id/accept", h.AcceptRequest)
-
 		invitations.POST("/:id/reject", h.RejectRequest)
 	}
 }
