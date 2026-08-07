@@ -65,6 +65,12 @@ func FromTeamMember(member model.TeamMember) TeamMemberResponse {
 	}
 }
 
+type CreateInviteLinkRequest struct {
+	TeamID    uuid.UUID
+	MaxUses   int
+	ExpiresAt time.Time
+}
+
 func FromTeamMembers(members []model.TeamMember) []TeamMemberResponse {
 	result := make([]TeamMemberResponse, 0, len(members))
 

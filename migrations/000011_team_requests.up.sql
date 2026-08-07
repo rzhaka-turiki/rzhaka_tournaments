@@ -1,13 +1,12 @@
-CREATE TABLE team_requetsts (
+CREATE TABLE team_invitations (
     id UUID PRIMARY KEY,
     team_id UUID NOT NULL REFERENCES teams(id) ON DELETE CASCADE,
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
 
-    created_by NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    created_by UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     type TEXT NOT NULL CHECK (
         type IN (
             'invite',
-            'join_request',
             'invite_link'
         )
     ),
