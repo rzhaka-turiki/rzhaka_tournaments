@@ -13,4 +13,5 @@ var (
 	ErrAlreadyExists     = errors.New("already exists")
 	ErrInvitationExpired = errors.New("invitation expired")
 	ErrInvalidInviteLink = errors.New("invalid invite link")
+	ErrAlreadyInvited    = errors.New("already invited")
 )

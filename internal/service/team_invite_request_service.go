@@ -16,7 +16,7 @@ type TeamRequestService interface {
 	AcceptRequest(ctx context.Context, requestID, actorID uuid.UUID) error
 	RejectRequest(ctx context.Context, requestID, actorID uuid.UUID) error
 	GetTeamInvitations(ctx context.Context, teamID, actorID uuid.UUID) ([]model.TeamRequest, error)
-	GetUserInvitations(ctx context.Context, userID, actorID uuid.UUID) ([]model.TeamRequest, error)
+	GetUserInvitations(ctx context.Context, userID uuid.UUID) ([]model.TeamRequest, error)
 }
 
 type teamRequestService struct {
@@ -72,7 +72,7 @@ func (s *teamRequestService) CreateInvite(ctx context.Context, teamID, actorID, 
 		TeamID:    teamID,
 		UserID:    userID,
 		CreatedBy: actorID,
-		Type:      model.TeamRequestInviteLink,
+		Type:      model.TeamRequestInvite,
 		ExpiresAt: time.Now().Add(TeamInviteTTL),
 	}
 
@@ -173,7 +173,7 @@ func (s *teamRequestService) RejectRequest(ctx context.Context, requestID, actor
 	})
 }
 
-func (s *teamRequestService) GetUserInvitations(ctx context.Context, userID, actorID uuid.UUID) ([]model.TeamRequest, error) {
+func (s *teamRequestService) GetUserInvitations(ctx context.Context, userID uuid.UUID) ([]model.TeamRequest, error) {
 	var requests []model.TeamRequest
 
 	errs := s.txManager.WithinTransaction(ctx, func(tx pgx.Tx) error {

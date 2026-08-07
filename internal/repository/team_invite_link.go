@@ -41,6 +41,7 @@ const (
 		UPDATE team_invite_links
 		SET used_count = used_count + 1
 		WHERE id = $1
+			AND used_count < max_uses
 		RETURNING used_count;
 	`
 	deleteInviteLinkQuery = `
@@ -62,6 +63,28 @@ const (
 	)
 		RETURNING id, created_at, used_count;
 	`
+
+	getByTeamQuery = `
+	SELECT
+		id,
+		team_id,
+		token,
+		created_by,
+		max_uses,
+		used_count,
+		expires_at,
+		created_at
+	FROM team_invite_links
+	WHERE team_id = $1
+	ORDER BY created_at DESC;
+	`
+
+	deleteExpiredByTeamQuery = `
+	DELETE
+	FROM team_invite_links
+	WHERE team_id = $1
+		AND expires_at <= NOW();
+	`
 )
 
 type TeamInviteLinkRepository interface {
@@ -70,6 +93,8 @@ type TeamInviteLinkRepository interface {
 	GetByID(ctx context.Context, id uuid.UUID) (*model.TeamInviteLink, error)
 	IncrementUsage(ctx context.Context, id uuid.UUID) error
 	Delete(ctx context.Context, id uuid.UUID) error
+	DeleteExpiredByTeam(ctx context.Context, teamID uuid.UUID) error
+	GetByTeam(ctx context.Context, teamID uuid.UUID) ([]model.TeamInviteLink, error)
 }
 
 type teamInviteLinkRepository struct {
@@ -130,4 +155,32 @@ func scanInviteLink(row pgx.Row) (*model.TeamInviteLink, error) {
 	}
 
 	return &link, nil
+}
+
+func (r *teamInviteLinkRepository) GetByTeam(ctx context.Context, teamID uuid.UUID) ([]model.TeamInviteLink, error) {
+	rows, err := r.db.Query(ctx, getByTeamQuery, teamID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	links := make([]model.TeamInviteLink, 0)
+	for rows.Next() {
+		link, err := scanInviteLink(rows)
+		if err != nil {
+			return nil, err
+		}
+		links = append(links, *link)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return links, nil
+}
+
+func (r *teamInviteLinkRepository) DeleteExpiredByTeam(ctx context.Context, teamID uuid.UUID) error {
+	_, err := r.db.Exec(ctx, deleteExpiredByTeamQuery, teamID)
+	if err != nil {
+		return err
+	}
+	return nil
 }
