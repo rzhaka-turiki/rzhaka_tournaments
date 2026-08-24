@@ -4,12 +4,12 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/a1uka/rzhaka_tournaments/internal/service"
-	"github.com/a1uka/rzhaka_tournaments/internal/transport/rest/auth"
-	"github.com/a1uka/rzhaka_tournaments/internal/transport/rest/dto"
-	"github.com/a1uka/rzhaka_tournaments/internal/transport/rest/response"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/rzhaka-turiki/rzhaka_tournaments/internal/service"
+	"github.com/rzhaka-turiki/rzhaka_tournaments/internal/transport/rest/auth"
+	"github.com/rzhaka-turiki/rzhaka_tournaments/internal/transport/rest/dto"
+	"github.com/rzhaka-turiki/rzhaka_tournaments/internal/transport/rest/response"
 )
 
 type UserHandler struct {

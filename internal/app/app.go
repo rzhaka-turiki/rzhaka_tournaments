@@ -3,15 +3,15 @@ package app
 import (
 	"log"
 
-	"github.com/a1uka/rzhaka_tournaments/internal/config"
-	"github.com/a1uka/rzhaka_tournaments/internal/database"
-	"github.com/a1uka/rzhaka_tournaments/internal/transport/rest"
-	"github.com/a1uka/rzhaka_tournaments/internal/transport/rest/auth"
-	"github.com/a1uka/rzhaka_tournaments/internal/transport/rest/handlers"
-	"github.com/a1uka/rzhaka_tournaments/internal/transport/rest/middleware"
-	"github.com/a1uka/rzhaka_tournaments/internal/transport/rest/routes"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/rzhaka-turiki/rzhaka_tournaments/internal/config"
+	"github.com/rzhaka-turiki/rzhaka_tournaments/internal/database"
+	"github.com/rzhaka-turiki/rzhaka_tournaments/internal/transport/rest"
+	"github.com/rzhaka-turiki/rzhaka_tournaments/internal/transport/rest/auth"
+	"github.com/rzhaka-turiki/rzhaka_tournaments/internal/transport/rest/handlers"
+	"github.com/rzhaka-turiki/rzhaka_tournaments/internal/transport/rest/middleware"
+	"github.com/rzhaka-turiki/rzhaka_tournaments/internal/transport/rest/routes"
 )
 
 type App struct {

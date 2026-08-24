@@ -6,7 +6,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/a1uka/rzhaka_tournaments/internal/app"
+	"github.com/rzhaka-turiki/rzhaka_tournaments/internal/app"
 )
 
 func main() {

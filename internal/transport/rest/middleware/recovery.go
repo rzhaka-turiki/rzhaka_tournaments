@@ -4,8 +4,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/a1uka/rzhaka_tournaments/internal/transport/rest/response"
 	"github.com/gin-gonic/gin"
+	"github.com/rzhaka-turiki/rzhaka_tournaments/internal/transport/rest/response"
 )
 
 func Recovery() gin.HandlerFunc {

@@ -1,10 +1,10 @@
 package app
 
 import (
-	"github.com/a1uka/rzhaka_tournaments/internal/database"
-	"github.com/a1uka/rzhaka_tournaments/internal/repository"
-	"github.com/a1uka/rzhaka_tournaments/internal/service"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/rzhaka-turiki/rzhaka_tournaments/internal/database"
+	"github.com/rzhaka-turiki/rzhaka_tournaments/internal/repository"
+	"github.com/rzhaka-turiki/rzhaka_tournaments/internal/service"
 )
 
 type Container struct {

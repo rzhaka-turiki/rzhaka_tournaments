@@ -1,6 +1,6 @@
 package dto
 
-import "github.com/a1uka/rzhaka_tournaments/internal/model"
+import "github.com/rzhaka-turiki/rzhaka_tournaments/internal/model"
 
 type PermissionResponse struct {
 	ID          int    `json:"id"`

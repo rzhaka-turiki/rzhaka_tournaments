@@ -3,9 +3,9 @@ package repository
 import (
 	"context"
 
-	"github.com/a1uka/rzhaka_tournaments/internal/model"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+	"github.com/rzhaka-turiki/rzhaka_tournaments/internal/model"
 )
 
 const (

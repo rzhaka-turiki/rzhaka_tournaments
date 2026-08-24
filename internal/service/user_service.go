@@ -6,9 +6,9 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/a1uka/rzhaka_tournaments/internal/model"
-	"github.com/a1uka/rzhaka_tournaments/internal/repository"
-	"github.com/a1uka/rzhaka_tournaments/internal/transport/rest/dto"
+	"github.com/rzhaka-turiki/rzhaka_tournaments/internal/model"
+	"github.com/rzhaka-turiki/rzhaka_tournaments/internal/repository"
+	"github.com/rzhaka-turiki/rzhaka_tournaments/internal/transport/rest/dto"
 )
 
 type UserService interface {
