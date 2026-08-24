@@ -42,13 +42,18 @@ func New() (*App, error) {
 	)
 
 	// container w/ handlers
-	container := NewContainer(db)
+	container, err := NewContainer(db, cfg)
+	if err != nil {
+		db.Close()
+		return nil, err
+	}
 	restHandlers := rest.Handlers{
 		Health:         handlers.NewHealthHandler(db),
 		User:           handlers.NewUserHandler(container.Services.User),
 		Role:           handlers.NewRoleHandler(container.Services.Role),
 		Permission:     handlers.NewPermissionHandler(container.Repositories.Permission),
 		RolePermission: handlers.NewRolePermissionHandler(container.Services.RolePermission),
+		ApexAccounts:   handlers.NewApexAccountHandler(container.Services.ApexAccount),
 	}
 	routes.RegisterRoutes(router, &restHandlers)
 
@@ -65,8 +70,15 @@ func (a *App) Run() error {
 }
 
 func (a *App) Shutdown() {
+	if a.container != nil && a.container.Clients.ApexVerifier != nil {
+		if err := a.container.Clients.ApexVerifier.Close(); err != nil {
+			log.Printf("failed to close apex verifier client: %v", err)
+		}
+	}
+
 	if a.db != nil {
 		a.db.Close()
 	}
+
 	log.Println("application stopped")
 }

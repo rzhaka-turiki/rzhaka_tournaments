@@ -8,4 +8,5 @@ type Services struct {
 	Permission service.PermissionService
 
 	RolePermission service.RolePermissionService
+	ApexAccount    service.ApexAccountService
 }

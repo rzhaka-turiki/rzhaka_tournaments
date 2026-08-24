@@ -9,12 +9,17 @@ import (
 )
 
 type Config struct {
-	Server   ServerConfig
-	Database DatabaseConfig
-	Results  ResultsConfig
-	Redis    RedisConfig
-	Bot      BotConfig
-	JWT      JWTConfig
+	Server       ServerConfig
+	Database     DatabaseConfig
+	Results      ResultsConfig
+	ApexVerifier ApexVerifierConfig
+	Redis        RedisConfig
+	Bot          BotConfig
+	JWT          JWTConfig
+}
+
+type ApexVerifierConfig struct {
+	GRPCAddr string
 }
 
 type ServerConfig struct {
@@ -68,6 +73,12 @@ func Load() (*Config, error) {
 		JWT: JWTConfig{
 			PublicKeyPath: getEnv("JWT_PUBLIC_KEY", "./keys/public.pem"),
 			AccessTTL:     15 * time.Minute,
+		},
+		ApexVerifier: ApexVerifierConfig{
+			GRPCAddr: getEnv(
+				"GRPC_APEX_VERIFIER_ADDR",
+				"localhost:50051",
+			),
 		},
 	}
 	if cfg.Database.URL == "" {

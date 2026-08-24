@@ -10,6 +10,7 @@ import (
 
 type Client interface {
 	VerifyAccount(ctx context.Context, player string, platform string, level int32) (*VerifyAccountResult, error)
+	Close() error
 }
 
 type VerifyAccountResult struct {
@@ -50,4 +51,8 @@ func (c *client) VerifyAccount(ctx context.Context, player string, platform stri
 		Platform: resp.Platform,
 		Level:    resp.Level,
 	}, nil
+}
+
+func (c *client) Close() error {
+	return c.conn.Close()
 }
