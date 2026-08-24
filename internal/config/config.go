@@ -16,8 +16,13 @@ type Config struct {
 	Redis        RedisConfig
 	Bot          BotConfig
 	JWT          JWTConfig
+	MatchAPI     MatchAPIConfig
 }
 
+type MatchAPIConfig struct {
+	GRPCAddr string
+	APIKey   string
+}
 type ApexVerifierConfig struct {
 	GRPCAddr string
 }
@@ -79,6 +84,13 @@ func Load() (*Config, error) {
 				"GRPC_APEX_VERIFIER_ADDR",
 				"localhost:50051",
 			),
+		},
+		MatchAPI: MatchAPIConfig{
+			GRPCAddr: getEnv(
+				"GRPC_MATCH_API_ADDR",
+				"localhost:50052",
+			),
+			APIKey: getEnv("MATCH_API_KEY", ""),
 		},
 	}
 	if cfg.Database.URL == "" {

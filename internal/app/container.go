@@ -3,6 +3,7 @@ package app
 import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/rzhaka-turiki/rzhaka_tournaments/internal/client/apexverifier"
+	"github.com/rzhaka-turiki/rzhaka_tournaments/internal/client/matchapi"
 	"github.com/rzhaka-turiki/rzhaka_tournaments/internal/config"
 	"github.com/rzhaka-turiki/rzhaka_tournaments/internal/database"
 	"github.com/rzhaka-turiki/rzhaka_tournaments/internal/repository"
@@ -32,6 +33,7 @@ func NewContainer(db *pgxpool.Pool, cfg *config.Config) (*Container, error) {
 	apexAccountRepository := repository.NewApexAccountRepository(db)
 	// cleints
 	apexVerifierClient, err := apexverifier.NewClient(cfg.ApexVerifier.GRPCAddr)
+	matchAPI, err := matchapi.NewClient(cfg.MatchAPI.GRPCAddr, cfg.MatchAPI.APIKey)
 	// services
 	userService := service.NewUserService(userRepository, roleRepository)
 	roleService := service.NewRoleService(txManager, roleRepository, eventRepository)
@@ -65,6 +67,7 @@ func NewContainer(db *pgxpool.Pool, cfg *config.Config) (*Container, error) {
 		},
 		Clients: Clients{
 			ApexVerifier: apexVerifierClient,
+			MatchAPI:     matchAPI,
 		},
 		TxManager: txManager,
 	}, nil

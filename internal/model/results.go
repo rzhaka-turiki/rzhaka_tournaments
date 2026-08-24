@@ -41,10 +41,11 @@ type PlayerMatchResult struct {
 }
 
 type MatchResult struct {
-	MatchID   uuid.UUID         `json:"match_id"`
-	Map       string            `json:"map"`
-	StartedAt time.Time         `json:"started_at"`
-	Teams     []TeamMatchResult `json:"teams"`
+	MatchID     uuid.UUID         `json:"match_id"`
+	GameMatchID string            `json:"game_match_id,omitempty"`
+	Map         string            `json:"map"`
+	StartedAt   time.Time         `json:"started_at"`
+	Teams       []TeamMatchResult `json:"teams"`
 }
 
 type StageResult struct {

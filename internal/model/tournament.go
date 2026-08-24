@@ -27,10 +27,10 @@ type Match struct {
 	ID           uuid.UUID
 	Map          string
 	Status       string
-	StartAt      time.Time
+	StartedAt    *time.Time
 	TournamentID uuid.UUID
 	StageID      uuid.UUID
-	Drafts       []DropSpot
+	FinishedAt   *time.Time
 	StatsCodeID  int
 	// Idk should we store teams here or not
 }
