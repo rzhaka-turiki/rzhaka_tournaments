@@ -3,8 +3,8 @@ package repository
 import (
 	"context"
 
-	"github.com/a1uka/rzhaka_tournaments/internal/model"
 	"github.com/google/uuid"
+	"github.com/rzhaka-turiki/rzhaka_tournaments/internal/model"
 )
 
 type TeamRequestRepository interface {
@@ -14,6 +14,8 @@ type TeamRequestRepository interface {
 	GetByUser(ctx context.Context, userID uuid.UUID) ([]model.TeamRequest, error)
 	Exists(ctx context.Context, teamID, userID uuid.UUID) (bool, error)
 	Delete(ctx context.Context, ID uuid.UUID) error
+	DeleteExpiredByTeam(ctx context.Context, teamID uuid.UUID) error
+	DeleteExpiredByUser(ctx context.Context, userID uuid.UUID) error
 }
 
 type teamRequestRepository struct {
@@ -28,12 +30,12 @@ func NewTeamRequestRepository(db DBTX) TeamRequestRepository {
 
 func (r *teamRequestRepository) Create(ctx context.Context, req *model.TeamRequest) error {
 	query := `
-	INSERT INTO team_requests (
+	INSERT INTO team_invitations (
 		team_id,
 		user_id,
 		created_by,
 		type,
-		expires_at,
+		expires_at
 	)
 	VALUES ($1,$2,$3,$4,$5)
 	RETURNING
@@ -59,7 +61,7 @@ func (r *teamRequestRepository) Exists(ctx context.Context, teamID, userID uuid.
 	query := `
 	SELECT EXISTS(
 		SELECT 1
-		FROM team_requests
+		FROM team_invitations
 		WHERE team_id = $1
 		  AND user_id = $2
 	)
@@ -80,7 +82,7 @@ func (r *teamRequestRepository) GetByID(ctx context.Context, ID uuid.UUID) (*mod
 		type,
 		expires_at,
 		created_at
-	FROM team_requests
+	FROM team_invitations
 	WHERE id = $1
 	`
 	var req model.TeamRequest
@@ -102,7 +104,7 @@ func (r *teamRequestRepository) GetByID(ctx context.Context, ID uuid.UUID) (*mod
 func (r *teamRequestRepository) Delete(ctx context.Context, ID uuid.UUID) error {
 	query := `
 	DELETE
-	FROM team_requests
+	FROM team_invitations
 	WHERE id = $1
 	`
 	result, err := r.db.Exec(ctx, query, ID)
@@ -125,8 +127,8 @@ func (r *teamRequestRepository) GetByTeam(ctx context.Context, teamID uuid.UUID)
 		type,
 		expires_at,
 		created_at
-	FROM team_requests
-	WHERE id = $1
+	FROM team_invitations
+	WHERE team_id = $1
 	ORDER BY created_at
 	`
 	rows, err := r.db.Query(ctx, query, teamID)
@@ -165,7 +167,7 @@ func (r *teamRequestRepository) GetByUser(ctx context.Context, userID uuid.UUID)
 		type,
 		expires_at,
 		created_at
-	FROM team_requests
+	FROM team_invitations
 	WHERE user_id = $1
 	ORDER BY created_at
 	`
@@ -193,4 +195,26 @@ func (r *teamRequestRepository) GetByUser(ctx context.Context, userID uuid.UUID)
 		reqs = append(reqs, req)
 	}
 	return reqs, nil
+}
+
+func (r *teamRequestRepository) DeleteExpiredByTeam(ctx context.Context, teamID uuid.UUID) error {
+	query := `
+	DELETE
+	FROM team_invitations
+	WHERE team_id = $1
+		AND expires_at <= NOW()
+	`
+	_, err := r.db.Exec(ctx, query, teamID)
+	return err
+}
+
+func (r *teamRequestRepository) DeleteExpiredByUser(ctx context.Context, userID uuid.UUID) error {
+	query := `
+	DELETE
+	FROM team_invitations
+	WHERE user_id = $1
+		AND expires_at <= NOW()
+	`
+	_, err := r.db.Exec(ctx, query, userID)
+	return err
 }

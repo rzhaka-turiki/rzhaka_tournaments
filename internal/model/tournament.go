@@ -14,27 +14,6 @@ type DropSpot struct {
 	Spot    int
 }
 
-type Legend struct {
-	ID       uuid.UUID
-	Name     string
-	ImageURL string
-	Class    string
-	Ability  string
-	Ultimate string
-}
-
-type Match struct {
-	ID           uuid.UUID
-	Map          string
-	Status       string
-	StartAt      time.Time
-	TournamentID uuid.UUID
-	StageID      uuid.UUID
-	Drafts       []DropSpot
-	StatsCodeID  int
-	// Idk should we store teams here or not
-}
-
 type Group struct {
 	ID            uuid.UUID
 	Format        string

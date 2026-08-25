@@ -1,8 +1,8 @@
 package routes
 
 import (
-	"github.com/a1uka/rzhaka_tournaments/internal/transport/rest"
 	"github.com/gin-gonic/gin"
+	"github.com/rzhaka-turiki/rzhaka_tournaments/internal/transport/rest"
 )
 
 func RegisterRoutes(
@@ -17,5 +17,8 @@ func RegisterRoutes(
 		registerPermissions(v1, h.Permission)
 		registerRolePermissions(v1, h.RolePermission)
 		registerTeams(v1, h.Team)
+		registerTeamInviteLinks(v1, h.TeamInviteLinks)
+		registerTeamRequests(v1, h.TeamInvites)
+		registerApexAccounts(v1, h.ApexAccounts)
 	}
 }

@@ -4,12 +4,12 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/a1uka/rzhaka_tournaments/internal/database"
-	"github.com/a1uka/rzhaka_tournaments/internal/model"
-	"github.com/a1uka/rzhaka_tournaments/internal/permission"
-	"github.com/a1uka/rzhaka_tournaments/internal/repository"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+	"github.com/rzhaka-turiki/rzhaka_tournaments/internal/database"
+	"github.com/rzhaka-turiki/rzhaka_tournaments/internal/model"
+	"github.com/rzhaka-turiki/rzhaka_tournaments/internal/permission"
+	"github.com/rzhaka-turiki/rzhaka_tournaments/internal/repository"
 )
 
 type RoleService interface {

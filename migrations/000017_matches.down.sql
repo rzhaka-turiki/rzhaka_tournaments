@@ -1,0 +1,2 @@
+DROP TABLE IF EXISTS match_settings;
+DROP TABLE IF EXISTS matches;

@@ -1,6 +1,6 @@
 package app
 
-import "github.com/a1uka/rzhaka_tournaments/internal/service"
+import "github.com/rzhaka-turiki/rzhaka_tournaments/internal/service"
 
 type Services struct {
 	User       service.UserService
@@ -8,4 +8,5 @@ type Services struct {
 	Permission service.PermissionService
 
 	RolePermission service.RolePermissionService
+	ApexAccount    service.ApexAccountService
 }

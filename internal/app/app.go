@@ -3,15 +3,15 @@ package app
 import (
 	"log"
 
-	"github.com/a1uka/rzhaka_tournaments/internal/config"
-	"github.com/a1uka/rzhaka_tournaments/internal/database"
-	"github.com/a1uka/rzhaka_tournaments/internal/transport/rest"
-	"github.com/a1uka/rzhaka_tournaments/internal/transport/rest/auth"
-	"github.com/a1uka/rzhaka_tournaments/internal/transport/rest/handlers"
-	"github.com/a1uka/rzhaka_tournaments/internal/transport/rest/middleware"
-	"github.com/a1uka/rzhaka_tournaments/internal/transport/rest/routes"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/rzhaka-turiki/rzhaka_tournaments/internal/config"
+	"github.com/rzhaka-turiki/rzhaka_tournaments/internal/database"
+	"github.com/rzhaka-turiki/rzhaka_tournaments/internal/transport/rest"
+	"github.com/rzhaka-turiki/rzhaka_tournaments/internal/transport/rest/auth"
+	"github.com/rzhaka-turiki/rzhaka_tournaments/internal/transport/rest/handlers"
+	"github.com/rzhaka-turiki/rzhaka_tournaments/internal/transport/rest/middleware"
+	"github.com/rzhaka-turiki/rzhaka_tournaments/internal/transport/rest/routes"
 )
 
 type App struct {
@@ -42,13 +42,18 @@ func New() (*App, error) {
 	)
 
 	// container w/ handlers
-	container := NewContainer(db)
+	container, err := NewContainer(db, cfg)
+	if err != nil {
+		db.Close()
+		return nil, err
+	}
 	restHandlers := rest.Handlers{
 		Health:         handlers.NewHealthHandler(db),
 		User:           handlers.NewUserHandler(container.Services.User),
 		Role:           handlers.NewRoleHandler(container.Services.Role),
 		Permission:     handlers.NewPermissionHandler(container.Repositories.Permission),
 		RolePermission: handlers.NewRolePermissionHandler(container.Services.RolePermission),
+		ApexAccounts:   handlers.NewApexAccountHandler(container.Services.ApexAccount),
 	}
 	routes.RegisterRoutes(router, &restHandlers)
 
@@ -65,8 +70,15 @@ func (a *App) Run() error {
 }
 
 func (a *App) Shutdown() {
+	if a.container != nil && a.container.Clients.ApexVerifier != nil {
+		if err := a.container.Clients.ApexVerifier.Close(); err != nil {
+			log.Printf("failed to close apex verifier client: %v", err)
+		}
+	}
+
 	if a.db != nil {
 		a.db.Close()
 	}
+
 	log.Println("application stopped")
 }

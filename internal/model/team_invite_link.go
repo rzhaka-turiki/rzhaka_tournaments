@@ -16,3 +16,9 @@ type TeamInviteLink struct {
 	ExpiresAt time.Time
 	CreatedAt time.Time
 }
+
+type InviteLinkPreview struct {
+	TeamID    uuid.UUID
+	TeamName  string
+	ExpiresAt time.Time
+}

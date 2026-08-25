@@ -3,9 +3,9 @@ package service
 import (
 	"context"
 
-	"github.com/a1uka/rzhaka_tournaments/internal/model"
-	"github.com/a1uka/rzhaka_tournaments/internal/repository"
 	"github.com/google/uuid"
+	"github.com/rzhaka-turiki/rzhaka_tournaments/internal/model"
+	"github.com/rzhaka-turiki/rzhaka_tournaments/internal/repository"
 )
 
 func CanManageRole(ctx context.Context, roleRepo repository.RoleRepository, actorID uuid.UUID, role *model.Role) error {

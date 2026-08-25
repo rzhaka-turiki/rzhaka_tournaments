@@ -1,0 +1,136 @@
+syntax = "proto3";
+
+package matchapi;
+
+option go_package = "github.com/rzhaka-turiki/rzhaka_tournaments/internal/client/matchapi/proto;matchapipb";
+
+service MatchService {
+  rpc AddToken(AddTokenRequest) returns (AddTokenResponse);
+  rpc ListTokens(ListTokensRequest) returns (ListTokensResponse);
+  rpc ListMatches(ListMatchesRequest) returns (ListMatchesResponse);
+  rpc GetMatchStats(MatchStatsRequest) returns (MatchStatsResponse);
+  rpc GetMatchDetail(MatchDetailRequest) returns (MatchDetailResponse);
+  rpc GetPlayerStats(PlayerStatsRequest) returns (PlayerStatsResponse);
+}
+
+message AddTokenRequest {
+  string activation = 1;
+  string expiration = 2;
+  string stats_token = 3;
+  string admin_token = 4;
+  string player_token = 5;
+}
+
+message AddTokenResponse {
+  int32 token_id = 1;
+  string message = 2;
+}
+
+message ListTokensRequest {
+  bool only_active = 1;
+  int32 page_size = 2;
+  string page_token = 3;
+}
+
+message TokenInfo {
+  int32 id = 1;
+  string activation = 2;
+  string expiration = 3;
+  bool is_active = 4;
+}
+
+message ListTokensResponse {
+  repeated TokenInfo tokens = 1;
+  string next_page_token = 2;
+  int32 total_count = 3;
+}
+
+message ListMatchesRequest {
+  string start_date = 1;
+  string end_date = 2;
+  string map_name = 3;
+  string player_hash = 4;
+  int32 page_size = 5;
+  string page_token = 6;
+  int32 token_id = 7;
+}
+
+message MatchSummary {
+  int32 id = 1;
+  string mid = 2;
+  string map_name = 3;
+  string match_start = 4;
+  int32 player_count = 5;
+  int32 token_id = 6;
+}
+
+message ListMatchesResponse {
+  repeated MatchSummary matches = 1;
+  string next_page_token = 2;
+  int32 total_count = 3;
+}
+
+message MatchDetailRequest { int32 match_id = 1; }
+
+message PlayerResult {
+  string player_name = 1;
+  string character_name = 2;
+  int32 kills = 3;
+  int32 assists = 4;
+  int32 knockdowns = 5;
+  int32 damage_dealt = 6;
+  int32 survival_time = 7;
+  string team_name = 8;
+  int32 team_placement = 9;
+  string nid_hash = 10;
+}
+
+message MatchDetailResponse {
+  int32 match_id = 1;
+  string mid = 2;
+  string map_name = 3;
+  bool aim_assist_allowed = 4;
+  string match_start = 5;
+  repeated PlayerResult players = 6;
+}
+
+message MatchStatsRequest {
+  string start_date = 1;
+  string end_date = 2;
+  string map_name = 3;
+  int32 min_kills = 4;
+  int32 max_kills = 5;
+  string player_hash = 6;
+}
+
+message MatchStatsResponse {
+  int32 total_matches = 1;
+  int32 total_players = 2;
+  double avg_kills = 3;
+  double avg_damage = 4;
+  double avg_survival_time = 5;
+}
+
+message PlayerStatsRequest {
+  string player_hash = 1;
+  string start_date = 2;
+  string end_date = 3;
+}
+
+message PlayerStatsResponse {
+  string player_hash = 1;
+  int32 matches_played = 2;
+  int32 total_kills = 3;
+  int32 total_damage = 4;
+  double avg_damage = 5;
+  double avg_survival_time = 6;
+  int32 total_wins = 7;
+  repeated CharacterStats top_characters = 8;
+}
+
+message CharacterStats {
+  string character_name = 1;
+  int32 matches = 2;
+  int32 kills = 3;
+  int32 picks = 4;
+}

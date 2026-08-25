@@ -3,8 +3,8 @@ package service
 import (
 	"context"
 
-	"github.com/a1uka/rzhaka_tournaments/internal/model"
-	"github.com/a1uka/rzhaka_tournaments/internal/repository"
+	"github.com/rzhaka-turiki/rzhaka_tournaments/internal/model"
+	"github.com/rzhaka-turiki/rzhaka_tournaments/internal/repository"
 )
 
 type PermissionService interface {
