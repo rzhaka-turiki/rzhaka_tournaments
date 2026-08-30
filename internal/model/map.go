@@ -1,6 +1,10 @@
 package model
 
-import "github.com/google/uuid"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type Map struct {
 	ID                uuid.UUID
@@ -9,6 +13,8 @@ type Map struct {
 	ImageURL          string
 	MinimapImageURL   string
 	SupportsDropSpots bool
+	CreatedAt         time.Time
+	UpdatedAt         time.Time
 }
 
 type MapLocation struct {
