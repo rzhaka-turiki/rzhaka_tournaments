@@ -1,17 +1,25 @@
 package model
 
-import "github.com/google/uuid"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type Legend struct {
-	ID       uuid.UUID
-	Name     string
-	ImageURL string
-	Class    string
-	Ability  string
-	Ultimate string
+	ID              uuid.UUID
+	Name            string
+	InGameName      string
+	ImageURL        string
+	ProfileImageURL string
+	Class           string
+	Ability         string
+	Ultimate        string
 }
 
 type MatchLegendBan struct {
-	MatchID  uuid.UUID
-	LegendID uuid.UUID
+	ID        uuid.UUID
+	MatchID   uuid.UUID
+	LegendID  uuid.UUID
+	CreatedAt time.Time
 }

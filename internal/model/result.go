@@ -4,47 +4,51 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"google.golang.org/genproto/googleapis/type/decimal"
 )
 
 type MatchResult struct {
-	ID        uuid.UUID
-	MatchID   *uuid.UUID
-	MapID     uuid.UUID
-	StartedAt time.Time
+	ID               uuid.UUID
+	MatchID          *uuid.UUID
+	ExternalMID      string
+	MapID            *uuid.UUID
+	StartedAt        time.Time
+	AimAssistAllowed bool
 
-	Slots []SlotMatchResult
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
-type SlotMatchResult struct {
-	ID       uuid.UUID
-	ResultID uuid.UUID
-	SlotID   uuid.UUID
+type MatchResultSlot struct {
+	ID            uuid.UUID
+	MatchResultID uuid.UUID
+	SlotNumber    int
 
-	Placement int
-	Points    int
-	Kills     int
+	TeamName      *string
+	TeamPlacement *int
+	Points        decimal.Decimal
+	Kills         int
 
-	SourceTeamName string
+	MatchSlotID *uuid.UUID
 
-	Players []PlayerMatchResult
+	CreatedAt time.Time
 }
 
-type PlayerMatchResult struct {
-	ID           uuid.UUID
-	SlotResultID uuid.UUID
+type MatchResultPlayer struct {
+	ID                uuid.UUID
+	MatchResultSlotID uuid.UUID
 
-	NIDHash  string
-	Gamertag string
-	Legend   string
+	NIDHash    string
+	PlayerName string
 
-	Kills      int
-	Assists    int
-	Damage     int
-	Headshots  int
-	Revives    int
-	Respawns   int
-	TimeAlive  int
-	Hits       int
-	Shots      int
-	Knockdowns int
+	LegendID      *uuid.UUID
+	CharacterName string
+
+	Kills        int
+	Assists      int
+	Knockdowns   int
+	DamageDealt  int
+	SurvivalTime int
+
+	CreatedAt time.Time
 }

@@ -7,14 +7,14 @@ type Map struct {
 	Name              string
 	InGameName        string
 	ImageURL          string
+	MinimapImageURL   string
 	SupportsDropSpots bool
-	Locations         []MapLocation
 }
 
 type MapLocation struct {
-	ID          uuid.UUID
-	MapID       uuid.UUID
-	Name        string
-	ImageURL    string
-	MapPosition int
+	ID       uuid.UUID
+	MapID    uuid.UUID
+	Name     string
+	ImageURL string
+	Position int
 }
