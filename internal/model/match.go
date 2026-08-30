@@ -56,8 +56,10 @@ type MatchAPIToken struct {
 	ID              uuid.UUID
 	MatchAPITokenID int
 
-	Activation time.Time
-	Expiration time.Time
+	AddedBy        uuid.UUID
+	OrganisationID *uuid.UUID
+	Activation     time.Time
+	Expiration     time.Time
 
 	StatsToken  string
 	AdminToken  *string
