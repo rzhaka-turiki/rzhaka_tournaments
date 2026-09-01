@@ -124,3 +124,56 @@ func (r *mapRepository) List(ctx context.Context, limit, offset int) ([]model.Ma
 	}
 	return maps, nil
 }
+
+func (r *mapRepository) Update(ctx context.Context, apexMap *model.Map) error {
+	query := `
+	UPDATE maps
+	SET
+		name = $1,
+		in_game_name = $2,
+		image_url = $3,
+		minimap_image_url = $4,
+		supports_drop_spots = $5,
+		updated_at = NOW()
+	WHERE id = $6
+	`
+
+	result, err := r.db.Exec(
+		ctx,
+		query,
+		apexMap.Name,
+		apexMap.InGameName,
+		apexMap.ImageURL,
+		apexMap.MinimapImageURL,
+		apexMap.SupportsDropSpots,
+		apexMap.ID,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	if result.RowsAffected() == 0 {
+		return ErrNotFound
+	}
+	return nil
+}
+
+func (r *mapRepository) Delete(ctx context.Context, id uuid.UUID) error {
+	query := `
+	DELETE
+	FROM maps
+	WHERE id = $1
+	`
+
+	result, err := r.db.Exec(ctx, query, id)
+
+	if err != nil {
+		return err
+	}
+	if result.RowsAffected() == 0 {
+		return ErrNotFound
+	}
+
+	return nil
+}
