@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"google.golang.org/genproto/googleapis/type/decimal"
+	"github.com/shopspring/decimal"
 )
 
 type MatchResult struct {
@@ -12,6 +12,7 @@ type MatchResult struct {
 	MatchID          *uuid.UUID
 	ExternalMID      string
 	MapID            *uuid.UUID
+	MapName          string
 	StartedAt        time.Time
 	AimAssistAllowed bool
 
