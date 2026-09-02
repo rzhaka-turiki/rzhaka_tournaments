@@ -10,6 +10,7 @@ import (
 type MapRepository interface {
 	Create(ctx context.Context, apexMap *model.Map) error
 	GetByID(ctx context.Context, id uuid.UUID) (*model.Map, error)
+	GetByInGameName(ctx context.Context, inGameName string) (*model.Map, error)
 	List(ctx context.Context, limit, offset int) ([]model.Map, error)
 	Update(ctx context.Context, apexMap *model.Map) error
 	Delete(ctx context.Context, id uuid.UUID) error
@@ -176,4 +177,36 @@ func (r *mapRepository) Delete(ctx context.Context, id uuid.UUID) error {
 	}
 
 	return nil
+}
+
+func (r *mapRepository) GetByInGameName(ctx context.Context, inGameName string) (*model.Map, error) {
+	query := `
+	SELECT
+		id,
+		name,
+		in_game_name,
+		image_url,
+		minimap_image_url,
+		supports_drop_spots,
+		created_at,
+		updated_at
+	FROM maps
+	WHERE in_game_name = $1
+	`
+
+	var apexMap model.Map
+	err := r.db.QueryRow(ctx, query, inGameName).Scan(
+		&apexMap.ID,
+		&apexMap.Name,
+		&apexMap.InGameName,
+		&apexMap.ImageURL,
+		&apexMap.MinimapImageURL,
+		&apexMap.SupportsDropSpots,
+		&apexMap.CreatedAt,
+		&apexMap.UpdatedAt,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &apexMap, nil
 }

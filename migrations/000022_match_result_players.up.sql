@@ -17,6 +17,13 @@ CREATE TABLE match_result_players (
     knockdowns INT NOT NULL DEFAULT 0,
     damage_dealt INT NOT NULL DEFAULT 0,
     survival_time INT NOT NULL DEFAULT 0,
+    hardware TEXT NOT NULL DEFAULT NULL,
+    headshots INT NOT NULL DEFAULT 0,
+    shots INT NOT NULL DEFAULT 0,
+    hits INT NOT NULL DEFAULT 0,
+    respawns INT NOT NULL DEFAULT 0,
+    revives INT NOT NULL DEFAULT 0,
+
 
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

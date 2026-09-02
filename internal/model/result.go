@@ -50,5 +50,12 @@ type MatchResultPlayer struct {
 	DamageDealt  int
 	SurvivalTime int
 
+	Shots     int
+	Headshots int
+	Hardware  string
+	Hits      int
+	Revives   int
+	Respawns  int
+
 	CreatedAt time.Time
 }
