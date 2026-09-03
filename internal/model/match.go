@@ -55,6 +55,8 @@ type MatchSlotPlayer struct {
 	MatchSlotID     uuid.UUID
 	UserID          *uuid.UUID
 	ExpectedNIDHash *string
+	CreatedAt       time.Time
+	UpdatedAt       time.Time
 }
 
 type MatchAPIToken struct {
