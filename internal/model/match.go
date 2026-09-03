@@ -48,6 +48,8 @@ type MatchSlot struct {
 	MatchID    uuid.UUID
 	SlotNumber int
 	DropSpotID *uuid.UUID
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
 }
 
 type MatchSlotPlayer struct {
