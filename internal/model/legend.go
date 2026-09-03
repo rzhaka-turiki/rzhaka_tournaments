@@ -23,3 +23,15 @@ type MatchLegendBan struct {
 	LegendID  uuid.UUID
 	CreatedAt time.Time
 }
+
+type LegendSnapshot struct {
+	ID              uuid.UUID
+	LegendID        uuid.UUID
+	Name            string
+	InGameName      string
+	ImageURL        string
+	ProfileImageURL string
+	Class           string
+	Ability         string
+	Ultimate        string
+}
