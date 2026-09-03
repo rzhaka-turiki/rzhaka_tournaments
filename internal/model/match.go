@@ -29,13 +29,18 @@ type Match struct {
 
 type MatchSettings struct {
 	MatchID          uuid.UUID
+	MapID            uuid.UUID
 	PlaylistName     string
+	MapName          string
 	AdminChat        bool
 	TeamRename       bool
 	SelfAssign       bool
 	AimAssist        bool
 	AnonMode         bool
 	DropSpotsEnabled bool
+	FillBotsMode     bool
+	CreatedAt        time.Time
+	UpdatedAt        time.Time
 }
 
 type MatchSlot struct {
