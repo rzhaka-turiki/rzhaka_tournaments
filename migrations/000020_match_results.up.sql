@@ -1,9 +1,10 @@
 CREATE TABLE match_results (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
-    match_id UUID REFERENCES matches(id) ON DELETE SET NULL,
+    match_id UUID UNIQUE REFERENCES matches(id) ON DELETE SET NULL,
 
     external_mid TEXT NOT NULL UNIQUE,
+    map_name TEXT NOT NULL,
     map_id UUID REFERENCES maps(id) ON DELETE SET NULL,
 
     started_at TIMESTAMPTZ NOT NULL,

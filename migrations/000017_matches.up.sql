@@ -4,6 +4,7 @@ CREATE TABLE matches (
     map_id UUID NOT NULL REFERENCES maps(id),
     stats_token_id UUID REFERENCES match_api_tokens(id),
 
+    group_id UUID REFERENCES groups(id),
     status TEXT NOT NULL DEFAULT 'pending',
 
     start_at TIMESTAMPTZ,
@@ -27,11 +28,13 @@ CREATE TABLE match_settings (
     drop_spots_enabled BOOLEAN NOT NULL DEFAULT FALSE,
 
     playlist_name TEXT NOT NULL,
+    map_id UUID NOT NULL REFERENCES maps(id),
     admin_chat BOOLEAN NOT NULL DEFAULT FALSE,
     team_rename BOOLEAN NOT NULL DEFAULT FALSE,
     self_assign BOOLEAN NOT NULL DEFAULT TRUE,
     aim_assist BOOLEAN NOT NULL DEFAULT FALSE,
     anon_mode BOOLEAN NOT NULL DEFAULT FALSE,
+    fill_bots_mode BOOLEAN NOT NULL DEFAULT FALSE,
 
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()

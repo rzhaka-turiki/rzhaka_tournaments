@@ -2,6 +2,8 @@ CREATE TABLE match_api_tokens (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
     match_api_token_id INT NOT NULL UNIQUE,
+    added_by UUID NOT NULL REFERENCES users(id),
+    organisation_id NOT NULL UUID REFERENCES organisations(id),
 
     activation TIMESTAMPTZ NOT NULL,
     expiration TIMESTAMPTZ NOT NULL,
