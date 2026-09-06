@@ -76,3 +76,159 @@ func (r *organisationMembersRepository) GetByID(ctx context.Context, id uuid.UUI
 	}
 	return &member, nil
 }
+
+func (r *organisationMembersRepository) GetAll(ctx context.Context, limit, offset int) ([]model.OrganisationMember, error) {
+	query := `
+	SELECT
+		id,
+		user_id,
+		organisation_id,
+		role_id,
+		created_at,
+		updated_at
+	FROM organisation_members
+	ORDER BY created_at
+	LIMIT $1
+	OFFSET $2
+	`
+
+	rows, err := r.db.Query(ctx, query, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var members []model.OrganisationMember
+	for rows.Next() {
+		var member model.OrganisationMember
+		err = rows.Scan(
+			&member.ID,
+			&member.UserID,
+			&member.OrganisationID,
+			&member.RoleID,
+			&member.CreatedAt,
+			&member.UpdatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+		members = append(members, member)
+	}
+	return members, nil
+}
+
+func (r *organisationMembersRepository) GetByOrganisation(ctx context.Context, organisationID uuid.UUID) ([]model.OrganisationMember, error) {
+	query := `
+	SELECT
+		id,
+		user_id,
+		organisation_id,
+		role_id,
+		created_at,
+		updated_at,
+		added_by
+	FROM organisation_members
+	WHERE organisation_id = $1
+	`
+	rows, err := r.db.Query(ctx, query, organisationID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var members []model.OrganisationMember
+	for rows.Next() {
+		var member model.OrganisationMember
+		err = rows.Scan(
+			&member.ID,
+			&member.UserID,
+			&member.OrganisationID,
+			&member.RoleID,
+			&member.CreatedAt,
+			&member.UpdatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+		members = append(members, member)
+	}
+	return members, nil
+}
+
+func (r *organisationMembersRepository) GetByMember(ctx context.Context, memberID uuid.UUID) ([]model.OrganisationMember, error) {
+	query := `
+	SELECT
+		id,
+		user_id,
+		organisation_id,
+		role_id,
+		created_at,
+		updated_at,
+		added_by
+	FROM organisation_members
+	WHERE user_id = $1
+	`
+	rows, err := r.db.Query(ctx, query, memberID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var members []model.OrganisationMember
+	for rows.Next() {
+		var member model.OrganisationMember
+		err = rows.Scan(
+			&member.ID,
+			&member.UserID,
+			&member.OrganisationID,
+			&member.RoleID,
+			&member.CreatedAt,
+			&member.UpdatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+		members = append(members, member)
+	}
+	return members, nil
+}
+
+func (r *organisationMembersRepository) Update(ctx context.Context, member *model.OrganisationMember) error {
+	query := `
+	UPDATE organisation_members
+	SET
+		user_id = $1,
+		organisation_id = $2,
+		role_id = $3,
+		added_by = $4,
+		updated_at = NOW()
+	WHERE id = $5
+	`
+	result, err := r.db.Exec(ctx, query,
+		member.UserID,
+		member.OrganisationID,
+		member.RoleID,
+		member.AddedBy,
+		member.ID,
+	)
+	if err != nil {
+		return err
+	}
+	if result.RowsAffected() == 0 {
+		return ErrNotFound
+	}
+	return nil
+}
+
+func (r *organisationMembersRepository) Delete(ctx context.Context, id uuid.UUID) error {
+	query := `
+	DELETE
+	FROM organisation_members
+	WHERE id = $1
+	`
+	result, err := r.db.Exec(ctx, query, id)
+	if err != nil {
+		return err
+	}
+	if result.RowsAffected() == 0 {
+		return ErrNotFound
+	}
+	return nil
+}

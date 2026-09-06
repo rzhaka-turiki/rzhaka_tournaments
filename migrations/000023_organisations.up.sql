@@ -1,31 +1,38 @@
 CREATE TABLE organisations (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    name TEXT NOT NULL
+
+    name TEXT NOT NULL,
     short_name TEXT NOT NULL,
     image_url TEXT,
     banner_url TEXT,
+
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE organisation_roles (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    code TEXT NOT NULL UNIQUE,
     name TEXT NOT NULL,
     role_color TEXT,
+
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE organisation_members (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID NOT NULL REFERENCES users(id),
+
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    organisation_id UUID NOT NULL REFERENCES organisations(id) ON DELETE CASCADE,
     role_id UUID NOT NULL REFERENCES organisation_roles(id),
-    organisation_id UUID NOT NULL REFERENCES organisations(id),
+    
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
     added_by UUID REFERENCES users(id) DEFAULT NULL,
 
-    UNIQUE(user_id, role_id),
     UNIQUE(user_id, organisation_id)
 );
 

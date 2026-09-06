@@ -28,6 +28,7 @@ func NewOrganisationRoleRepository(db DBTX) OrganisationRolesRepository {
 func (r *organisationRolesRepository) Create(ctx context.Context, role *model.OrganisationRole) error {
 	query := `
 	INSERT INTO organisation_roles (
+		code,
 		name,
 		role_color
 	) VALUES ($1, $2)
@@ -38,6 +39,7 @@ func (r *organisationRolesRepository) Create(ctx context.Context, role *model.Or
 	`
 
 	return r.db.QueryRow(ctx, query, role.Name, role.RoleColor).Scan(
+		&role.Code,
 		&role.ID,
 		&role.CreatedAt,
 		&role.UpdatedAt,
@@ -48,6 +50,7 @@ func (r *organisationRolesRepository) GetByID(ctx context.Context, id uuid.UUID)
 	query := `
 	SELECT
 		id,
+		code,
 		name,
 		role_color,
 		created_at,
@@ -58,6 +61,7 @@ func (r *organisationRolesRepository) GetByID(ctx context.Context, id uuid.UUID)
 	var role model.OrganisationRole
 	err := r.db.QueryRow(ctx, query, id).Scan(
 		&role.ID,
+		&role.Code,
 		&role.Name,
 		&role.RoleColor,
 		&role.CreatedAt,
@@ -73,12 +77,14 @@ func (r *organisationRolesRepository) Update(ctx context.Context, role *model.Or
 	query := `
 	UPDATE organisation_roles
 	SET
-		name = $1,
-		role_color = $2,
+		code = $1,
+		name = $2,
+		role_color = $3,
 		updated_at = NOW()
-	WHERE id = $3
+	WHERE id = $4
 	`
 	result, err := r.db.Exec(ctx, query,
+		role.Code,
 		role.Name,
 		role.RoleColor,
 		role.ID,
@@ -111,6 +117,7 @@ func (r *organisationRolesRepository) GetAllRoles(ctx context.Context) ([]model.
 	query := `
 	SELECT
 		id,
+		code,
 		name,
 		role_color,
 		creatat_at,
@@ -127,6 +134,7 @@ func (r *organisationRolesRepository) GetAllRoles(ctx context.Context) ([]model.
 		var role model.OrganisationRole
 		err = rows.Scan(
 			&role.ID,
+			&role.Code,
 			&role.Name,
 			&role.RoleColor,
 			&role.CreatedAt,
