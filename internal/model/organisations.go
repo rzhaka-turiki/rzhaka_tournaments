@@ -29,6 +29,7 @@ type OrganisationMember struct {
 	UserID         uuid.UUID
 	RoleID         uuid.UUID
 	OrganisationID uuid.UUID
+	AddedBy        *uuid.UUID
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
 }

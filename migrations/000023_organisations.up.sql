@@ -22,7 +22,8 @@ CREATE TABLE organisation_members (
     role_id UUID NOT NULL REFERENCES organisation_roles(id),
     organisation_id UUID NOT NULL REFERENCES organisations(id),
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    added_by UUID REFERENCES users(id),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    added_by UUID REFERENCES users(id) DEFAULT NULL,
 
     UNIQUE(user_id, role_id),
     UNIQUE(user_id, organisation_id)
