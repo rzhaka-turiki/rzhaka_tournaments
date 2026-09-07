@@ -35,7 +35,7 @@ type UpdateTeamRequest struct {
 	LogoDarkPath *string `json:"logo_dark_path"`
 }
 
-type TransferOwnershipRequest struct {
+type TransferTeamOwnershipRequest struct {
 	NewOwnerID uuid.UUID `json:"new_owner_id" binding:"required"`
 }
 

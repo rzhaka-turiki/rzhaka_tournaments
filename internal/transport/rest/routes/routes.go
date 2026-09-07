@@ -20,5 +20,6 @@ func RegisterRoutes(
 		registerTeamInviteLinks(v1, h.TeamInviteLinks)
 		registerTeamRequests(v1, h.TeamInvites)
 		registerApexAccounts(v1, h.ApexAccounts)
+		registerOrganisations(v1, h.Organisations)
 	}
 }

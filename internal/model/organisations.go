@@ -7,29 +7,37 @@ import (
 )
 
 type Organisation struct {
-	ID        uuid.UUID
+	ID uuid.UUID
+
+	OwnerID   uuid.UUID
 	Name      string
 	ShortName string
 	ImageURL  string
 	BannerURL string
+
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
 
 type OrganisationRole struct {
-	ID        uuid.UUID
+	ID uuid.UUID
+
+	Code      string
 	Name      string
 	RoleColor string
+
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
 
 type OrganisationMember struct {
-	ID             uuid.UUID
+	ID uuid.UUID
+
 	UserID         uuid.UUID
 	RoleID         uuid.UUID
 	OrganisationID uuid.UUID
-	AddedBy        *uuid.UUID
-	CreatedAt      time.Time
-	UpdatedAt      time.Time
+
+	AddedBy   *uuid.UUID
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
