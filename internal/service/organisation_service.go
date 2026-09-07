@@ -17,6 +17,7 @@ type OrganisationService interface {
 	GetMemberOrganisations(ctx context.Context, userID uuid.UUID) ([]model.Organisation, error)
 	Update(ctx context.Context, actorID, organisationID uuid.UUID, req OrganisationUpdate) error
 	GetMembers(ctx context.Context, organisationID uuid.UUID) ([]model.OrganisationMember, error)
+	RemoveMember(ctx context.Context, organisationID, actorID, memberID uuid.UUID) error
 	TransferOwnership(ctx context.Context, organisationID, actorID, newOwnerID uuid.UUID) error
 }
 
@@ -151,4 +152,22 @@ func (s *organisationService) TransferOwnership(ctx context.Context, organisatio
 		}
 		return nil
 	})
+}
+
+func (s *organisationService) RemoveMember(ctx context.Context, organisationID, actorID, memberID uuid.UUID) error {
+	isOwner, err := s.organisationRepository.IsOwner(ctx, actorID, organisationID)
+	if err != nil {
+		return err
+	}
+	if !isOwner {
+		return ErrForbidden
+	}
+	isOwner, err = s.organisationRepository.IsOwner(ctx, memberID, organisationID)
+	if err != nil {
+		return err
+	}
+	if isOwner {
+		return ErrCannotRemoveOwner
+	}
+	return s.organisationMembersRepository.Remove(ctx, organisationID, memberID)
 }

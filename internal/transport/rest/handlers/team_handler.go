@@ -205,7 +205,7 @@ func (h *TeamHandler) TransferOwnership(c *gin.Context) {
 		response.Fail(c, http.StatusBadRequest, "INVALID_TEAM_ID", "invalid team id")
 		return
 	}
-	var req dto.TransferOwnershipRequest
+	var req dto.TransferTeamOwnershipRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		response.Fail(c, http.StatusBadRequest, "INVALID_BODY", "invalid request body")
 		return

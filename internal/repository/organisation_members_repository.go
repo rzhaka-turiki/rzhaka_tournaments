@@ -17,6 +17,7 @@ type OrganisationMembersRepository interface {
 	UpdateRole(ctx context.Context, organisationID, userID, roleID uuid.UUID) error
 	Exists(ctx context.Context, userID, organisationID uuid.UUID) (bool, error)
 	Delete(ctx context.Context, id uuid.UUID) error
+	Remove(ctx context.Context, organisationID, userID uuid.UUID) error
 }
 
 type organisationMembersRepository struct {
@@ -48,6 +49,22 @@ func (r *organisationMembersRepository) Create(ctx context.Context, member *mode
 		&member.CreatedAt,
 		&member.UpdatedAt,
 	)
+}
+
+func (r *organisationMembersRepository) Remove(ctx context.Context, organisationID, userID uuid.UUID) error {
+	query := `
+	DELETE FROM organisation_members
+	WHERE organisation_id = $1
+		AND user_id = $2
+	`
+	result, err := r.db.Exec(ctx, query, organisationID, userID)
+	if err != nil {
+		return err
+	}
+	if result.RowsAffected() == 0 {
+		return ErrNotFound
+	}
+	return nil
 }
 
 func (r *organisationMembersRepository) Exists(ctx context.Context, userID, organisationID uuid.UUID) (bool, error) {
