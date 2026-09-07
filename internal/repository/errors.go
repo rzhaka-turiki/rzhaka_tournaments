@@ -7,4 +7,5 @@ var (
 	ErrConflict      = errors.New("conflict")
 	ErrInvalid       = errors.New("invalid")
 	ErrNotTeamMember = errors.New("user is not team member")
+	ErrNotOrgMember  = errors.New("user is not organisation member")
 )

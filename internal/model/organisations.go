@@ -9,6 +9,7 @@ import (
 type Organisation struct {
 	ID uuid.UUID
 
+	OwnerID   uuid.UUID
 	Name      string
 	ShortName string
 	ImageURL  string

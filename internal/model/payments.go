@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/shopspring/decimal"
 )
 
 type OrganisationSubscription struct {
@@ -26,7 +27,7 @@ type OrganisationPayment struct {
 	OrganisationID uuid.UUID
 	SubscriptionID *uuid.UUID
 
-	Amount   int
+	Amount   decimal.Decimal
 	Currency string
 
 	Status string

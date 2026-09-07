@@ -14,6 +14,8 @@ type OrganisationMembersRepository interface {
 	GetByOrganisation(ctx context.Context, organisationID uuid.UUID) ([]model.OrganisationMember, error)
 	GetByMember(ctx context.Context, memberID uuid.UUID) ([]model.OrganisationMember, error)
 	Update(ctx context.Context, member *model.OrganisationMember) error
+	UpdateRole(ctx context.Context, organisationID, userID, roleID uuid.UUID) error
+	Exists(ctx context.Context, userID, organisationID uuid.UUID) (bool, error)
 	Delete(ctx context.Context, id uuid.UUID) error
 }
 
@@ -46,6 +48,23 @@ func (r *organisationMembersRepository) Create(ctx context.Context, member *mode
 		&member.CreatedAt,
 		&member.UpdatedAt,
 	)
+}
+
+func (r *organisationMembersRepository) Exists(ctx context.Context, userID, organisationID uuid.UUID) (bool, error) {
+	query := `
+	SELECT EXISTS(
+		SELECT 1
+		FROM organisation_members
+		WHERE user_id = $1
+			AND organisation_id = $2
+	)
+	`
+	var exists bool
+	err := r.db.QueryRow(ctx, query, userID, organisationID).Scan(&exists)
+	if err != nil {
+		return false, err
+	}
+	return exists, nil
 }
 
 func (r *organisationMembersRepository) GetByID(ctx context.Context, id uuid.UUID) (*model.OrganisationMember, error) {
@@ -114,6 +133,24 @@ func (r *organisationMembersRepository) GetAll(ctx context.Context, limit, offse
 		members = append(members, member)
 	}
 	return members, nil
+}
+
+func (r *organisationMembersRepository) UpdateRole(ctx context.Context, organisationID, userID, roleID uuid.UUID) error {
+	query := `
+	UPDATE organisation_members
+	SET
+		role_id = $1
+	WHERE user_id = $2
+		AND organisation_id = $3
+	`
+	result, err := r.db.Exec(ctx, query, roleID, userID, organisationID)
+	if err != nil {
+		return err
+	}
+	if result.RowsAffected() == 0 {
+		return ErrNotFound
+	}
+	return nil
 }
 
 func (r *organisationMembersRepository) GetByOrganisation(ctx context.Context, organisationID uuid.UUID) ([]model.OrganisationMember, error) {

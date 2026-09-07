@@ -1,6 +1,7 @@
 CREATE TABLE organisations (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
+    owner_id UUID NOT NULL REFERENCES users(id),
     name TEXT NOT NULL,
     short_name TEXT NOT NULL,
     image_url TEXT,
