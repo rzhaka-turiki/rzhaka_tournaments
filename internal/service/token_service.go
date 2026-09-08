@@ -66,11 +66,22 @@ func (s *tokenService) GetByOrganisationID(ctx context.Context, organisationID u
 	return s.tokenRepository.GetByOrganisation(ctx, organisationID, includeInactive)
 }
 
-func (s *tokenService) Update(ctx context.Context, actorID uuid.UUID, token *model.MatchAPIToken) error {
+func (s *tokenService) Update(ctx context.Context, actorID, organisationID, tokenID uuid.UUID, req TokenUpdate) error {
 	return s.txManager.WithinTransaction(ctx, func(tx pgx.Tx) error {
 		tokenRepo := repository.NewTokensRepository(tx)
 		orgRepo := repository.NewOrganisationRepository(tx)
 		orgMemberRepo := repository.NewOrganisationMembersRepository(tx)
 
+		isOwner, err := orgRepo.IsOwner(ctx, actorID, organisationID)
+		if err != nil {
+			return err
+		}
+		if !isOwner {
+			return ErrForbidden
+		}
+		token, err := tokenRepo.GetByID(ctx, tokenID)
+		if err != nil {
+			return err
+		}
 	})
 }
