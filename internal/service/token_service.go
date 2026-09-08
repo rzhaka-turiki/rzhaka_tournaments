@@ -53,9 +53,7 @@ func NewTokenService(
 	}
 }
 
-// What should it do?
-// It should create a new db record with token
-// Should I create an Org table???
+// Done
 func (s *tokenService) Create(ctx context.Context, actorID, organisationID uuid.UUID, token *model.MatchAPIToken) error {
 	return s.txManager.WithinTransaction(ctx, func(tx pgx.Tx) error {
 		tokenRepo := repository.NewTokensRepository(tx)
@@ -75,7 +73,6 @@ func (s *tokenService) Create(ctx context.Context, actorID, organisationID uuid.
 		}
 
 		token.OrganisationID = &organisationID
-		// needs to add API request to Match API 4 check token_id and check if it exists, if dont - add it
 		var tokensRequest matchapipb.ListTokensRequest
 		tokensRequest.OnlyActive = true
 		tokenResponse, err := s.matchAPIClient.ListTokens(ctx, &tokensRequest)
@@ -83,13 +80,32 @@ func (s *tokenService) Create(ctx context.Context, actorID, organisationID uuid.
 			return err
 		}
 		tokenIDs := tokenResponse.Tokens
-		for _, token := range tokenIDs {
-			if token.
+		flag := false
+		for _, tokenResp := range tokenIDs {
+			if (tokenResp.StatsToken == token.StatsToken) && (tokenResp.PlayerToken == *token.PlayerToken) && (tokenResp.AdminToken == *token.AdminToken) {
+				flag = true
+				token.MatchAPITokenID = int(tokenResp.Id)
+			}
+		}
+		if !flag {
+			var createTokenRequest matchapipb.AddTokenRequest
+			// sends time to API with ISO 8601 via UTC
+			createTokenRequest.Activation = token.Activation.UTC().Format(time.RFC3339)
+			createTokenRequest.Expiration = token.Expiration.UTC().Format(time.RFC3339)
+			createTokenRequest.AdminToken = *token.AdminToken
+			createTokenRequest.PlayerToken = *token.PlayerToken
+			createTokenRequest.StatsToken = token.StatsToken
+			response, err := s.matchAPIClient.AddToken(ctx, &createTokenRequest)
+			if err != nil {
+				return err
+			}
+			token.MatchAPITokenID = int(response.TokenId)
 		}
 		return tokenRepo.Create(ctx, token)
 	})
 }
 
+// Done
 func (s *tokenService) GetByID(ctx context.Context, tokenID, organisationID, actorID uuid.UUID) (*model.MatchAPIToken, error) {
 	isOwner, err := s.organisationMemberRepository.HasRole(ctx, organisationID, actorID, "owner")
 	if err != nil {
@@ -102,9 +118,10 @@ func (s *tokenService) GetByID(ctx context.Context, tokenID, organisationID, act
 	if !isOwner && !isAdmin {
 		return nil, ErrForbidden
 	}
-	return s.tokenRepository.GetByID(ctx, tokenID)
+	return s.tokenRepository.GetByID(ctx, tokenID, organisationID)
 }
 
+// Done
 func (s *tokenService) GetByOrganisationID(ctx context.Context, organisationID, actorID uuid.UUID, includeInactive bool) ([]model.MatchAPIToken, error) {
 	isOwner, err := s.organisationMemberRepository.HasRole(ctx, organisationID, actorID, "owner")
 	if err != nil {
@@ -120,6 +137,7 @@ func (s *tokenService) GetByOrganisationID(ctx context.Context, organisationID, 
 	return s.tokenRepository.GetByOrganisation(ctx, organisationID, includeInactive)
 }
 
+// Done
 func (s *tokenService) Update(ctx context.Context, organisationID, actorID, tokenID uuid.UUID, req TokenUpdate) error {
 	return s.txManager.WithinTransaction(ctx, func(tx pgx.Tx) error {
 		tokenRepo := repository.NewTokensRepository(tx)
@@ -136,7 +154,7 @@ func (s *tokenService) Update(ctx context.Context, organisationID, actorID, toke
 		if !isOwner && !isAdmin {
 			return ErrForbidden
 		}
-		token, err := tokenRepo.GetByID(ctx, tokenID)
+		token, err := tokenRepo.GetByID(ctx, tokenID, organisationID)
 		if err != nil {
 			return err
 		}
@@ -159,6 +177,7 @@ func (s *tokenService) Update(ctx context.Context, organisationID, actorID, toke
 	})
 }
 
+// Done
 func (s *tokenService) Delete(ctx context.Context, organisationID, actorID, tokenID uuid.UUID) error {
 	return s.txManager.WithinTransaction(ctx, func(tx pgx.Tx) error {
 		tokenRepo := repository.NewTokensRepository(tx)
@@ -174,6 +193,6 @@ func (s *tokenService) Delete(ctx context.Context, organisationID, actorID, toke
 		if !isAdmin && !isOwner {
 			return ErrForbidden
 		}
-		return tokenRepo.Delete(ctx, tokenID)
+		return tokenRepo.Delete(ctx, tokenID, organisationID)
 	})
 }

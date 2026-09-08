@@ -13,4 +13,5 @@ type Handlers struct {
 	TeamInvites     *handlers.TeamRequestHandler
 	ApexAccounts    *handlers.ApexAccountHandler
 	Organisations   *handlers.OrganisationHandler
+	Tokens          *handlers.TokenHandler
 }
