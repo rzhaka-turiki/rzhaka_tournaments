@@ -30,12 +30,25 @@ func NewContainer(db *pgxpool.Pool, cfg *config.Config) (*Container, error) {
 	eventRepository := repository.NewEventRepository(db)
 	permissionRepository := repository.NewPermissionRepository(db)
 	rolePermissionRepository := repository.NewRolePermissionRepository(db)
+	teamRepository := repository.NewTeamRepository(db)
+	teamMemberRepository := repository.NewTeamMemberRepository(db)
+	tokenRepository := repository.NewTokensRepository(db)
+	teamSnapshotRepository := repository.NewTeamSnapshotRepository(db)
 	apexAccountRepository := repository.NewApexAccountRepository(db)
+	organisationRepository := repository.NewOrganisationRepository(db)
+	organisationMemberRepository := repository.NewOrganisationMembersRepository(db)
 	// cleints
 	apexVerifierClient, err := apexverifier.NewClient(cfg.ApexVerifier.GRPCAddr)
 	matchAPI, err := matchapi.NewClient(cfg.MatchAPI.GRPCAddr, cfg.MatchAPI.APIKey)
 	// services
+	teamService := service.NewTeamService(txManager, teamRepository, teamMemberRepository, teamSnapshotRepository)
 	userService := service.NewUserService(userRepository, roleRepository)
+	organisationService := service.NewOrganisationService(
+		txManager,
+		organisationRepository,
+		organisationMemberRepository,
+	)
+	tokenService := service.NewTokenService(txManager, matchAPI, tokenRepository, organisationRepository, organisationMemberRepository)
 	roleService := service.NewRoleService(txManager, roleRepository, eventRepository)
 	permissionService := service.NewPermissionService(permissionRepository)
 	rolePermissionService := service.NewRolePermissionService(
@@ -52,16 +65,24 @@ func NewContainer(db *pgxpool.Pool, cfg *config.Config) (*Container, error) {
 	}
 	return &Container{
 		Repositories: Repositories{
-			User:        userRepository,
-			Role:        roleRepository,
-			Event:       eventRepository,
-			Permission:  permissionRepository,
-			ApexAccount: apexAccountRepository,
+			User:                   userRepository,
+			Role:                   roleRepository,
+			Event:                  eventRepository,
+			Team:                   teamRepository,
+			TeamMemberRepository:   teamMemberRepository,
+			TeamSnapshotRepository: teamSnapshotRepository,
+			TokenRepository:        tokenRepository,
+			Permission:             permissionRepository,
+			Organisation:           organisationRepository,
+			ApexAccount:            apexAccountRepository,
 		},
 		Services: Services{
 			User:           userService,
 			Role:           roleService,
 			Permission:     permissionService,
+			Team:           teamService,
+			Token:          tokenService,
+			Organisation:   organisationService,
 			RolePermission: rolePermissionService,
 			ApexAccount:    apexAccountService,
 		},

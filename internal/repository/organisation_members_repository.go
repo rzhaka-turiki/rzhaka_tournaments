@@ -12,6 +12,8 @@ type OrganisationMembersRepository interface {
 	GetByID(ctx context.Context, id uuid.UUID) (*model.OrganisationMember, error)
 	GetAll(ctx context.Context, limit, offset int) ([]model.OrganisationMember, error)
 	GetByOrganisation(ctx context.Context, organisationID uuid.UUID) ([]model.OrganisationMember, error)
+	HasRole(ctx context.Context, organisationID, userID uuid.UUID, roleCode string) (bool, error)
+	//GetRole(ctx context.Context, organisationID, userId uuid.UUID) (string, error)
 	GetByMember(ctx context.Context, memberID uuid.UUID) ([]model.OrganisationMember, error)
 	Update(ctx context.Context, member *model.OrganisationMember) error
 	UpdateRole(ctx context.Context, organisationID, userID, roleID uuid.UUID) error
@@ -150,6 +152,26 @@ func (r *organisationMembersRepository) GetAll(ctx context.Context, limit, offse
 		members = append(members, member)
 	}
 	return members, nil
+}
+
+func (r *organisationMembersRepository) HasRole(ctx context.Context, organisationID, userID uuid.UUID, roleCode string) (bool, error) {
+	query := `
+	SELECT EXISTS (
+    	SELECT 1 
+    	FROM organisation_members m
+    	JOIN organisation_roles r ON m.role_id = r.id
+    	WHERE m.user_id = $1 
+    		AND m.organisation_id = $2
+      		AND r.code = $3
+	) AS has_role;
+	`
+
+	var exists bool
+	err := r.db.QueryRow(ctx, query, userID, organisationID, roleCode).Scan(&exists)
+	if err != nil {
+		return false, err
+	}
+	return exists, nil
 }
 
 func (r *organisationMembersRepository) UpdateRole(ctx context.Context, organisationID, userID, roleID uuid.UUID) error {
