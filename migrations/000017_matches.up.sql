@@ -5,6 +5,7 @@ CREATE TABLE matches (
     stats_token_id UUID REFERENCES match_api_tokens(id),
 
     group_id UUID REFERENCES groups(id),
+    organisation_id UUID REFERENCES organisations(id),
     status TEXT NOT NULL DEFAULT 'pending',
 
     start_at TIMESTAMPTZ,

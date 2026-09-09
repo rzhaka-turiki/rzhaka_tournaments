@@ -13,7 +13,7 @@ type OrganisationMembersRepository interface {
 	GetAll(ctx context.Context, limit, offset int) ([]model.OrganisationMember, error)
 	GetByOrganisation(ctx context.Context, organisationID uuid.UUID) ([]model.OrganisationMember, error)
 	HasRole(ctx context.Context, organisationID, userID uuid.UUID, roleCode string) (bool, error)
-	//GetRole(ctx context.Context, organisationID, userId uuid.UUID) (string, error)
+	GetRole(ctx context.Context, organisationID, userId uuid.UUID) (*string, error)
 	GetByMember(ctx context.Context, memberID uuid.UUID) ([]model.OrganisationMember, error)
 	Update(ctx context.Context, member *model.OrganisationMember) error
 	UpdateRole(ctx context.Context, organisationID, userID, roleID uuid.UUID) error
@@ -67,6 +67,23 @@ func (r *organisationMembersRepository) Remove(ctx context.Context, organisation
 		return ErrNotFound
 	}
 	return nil
+}
+
+func (r *organisationMembersRepository) GetRole(ctx context.Context, organisationID, userId uuid.UUID) (*string, error) {
+	query := `
+	SELECT orole.code
+	FROM organisation_roles AS orole
+	INNER JOIN organisation_members AS omem 
+    	ON orole.id = omem.role_id
+	WHERE omem.organisation_id = $1
+  		AND omem.user_id = $2
+	`
+	var roleCode string
+	err := r.db.QueryRow(ctx, query, organisationID, userId).Scan(&roleCode)
+	if err != nil {
+		return nil, err
+	}
+	return &roleCode, nil
 }
 
 func (r *organisationMembersRepository) Exists(ctx context.Context, userID, organisationID uuid.UUID) (bool, error) {

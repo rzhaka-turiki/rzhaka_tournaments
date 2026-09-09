@@ -59,16 +59,11 @@ func (s *tokenService) Create(ctx context.Context, actorID, organisationID uuid.
 		tokenRepo := repository.NewTokensRepository(tx)
 		orgMemberRepo := repository.NewOrganisationMembersRepository(tx)
 
-		// Поменять потом isOwner на проверку разрешений роли
-		isOwner, err := orgMemberRepo.HasRole(ctx, organisationID, actorID, "owner")
+		roleCode, err := orgMemberRepo.GetRole(ctx, organisationID, actorID)
 		if err != nil {
 			return err
 		}
-		isAdmin, err := orgMemberRepo.HasRole(ctx, organisationID, actorID, "admin")
-		if err != nil {
-			return err
-		}
-		if !isOwner && !isAdmin {
+		if (*roleCode != "owner") && (*roleCode != "admin") {
 			return ErrForbidden
 		}
 
@@ -107,15 +102,11 @@ func (s *tokenService) Create(ctx context.Context, actorID, organisationID uuid.
 
 // Done
 func (s *tokenService) GetByID(ctx context.Context, tokenID, organisationID, actorID uuid.UUID) (*model.MatchAPIToken, error) {
-	isOwner, err := s.organisationMemberRepository.HasRole(ctx, organisationID, actorID, "owner")
+	roleCode, err := s.organisationMemberRepository.GetRole(ctx, organisationID, actorID)
 	if err != nil {
 		return nil, err
 	}
-	isAdmin, err := s.organisationMemberRepository.HasRole(ctx, organisationID, actorID, "admin")
-	if err != nil {
-		return nil, err
-	}
-	if !isOwner && !isAdmin {
+	if (*roleCode != "owner") && (*roleCode != "admin") {
 		return nil, ErrForbidden
 	}
 	return s.tokenRepository.GetByID(ctx, tokenID, organisationID)
@@ -123,15 +114,11 @@ func (s *tokenService) GetByID(ctx context.Context, tokenID, organisationID, act
 
 // Done
 func (s *tokenService) GetByOrganisationID(ctx context.Context, organisationID, actorID uuid.UUID, includeInactive bool) ([]model.MatchAPIToken, error) {
-	isOwner, err := s.organisationMemberRepository.HasRole(ctx, organisationID, actorID, "owner")
+	roleCode, err := s.organisationMemberRepository.GetRole(ctx, organisationID, actorID)
 	if err != nil {
 		return nil, err
 	}
-	isAdmin, err := s.organisationMemberRepository.HasRole(ctx, organisationID, actorID, "admin")
-	if err != nil {
-		return nil, err
-	}
-	if !isOwner && !isAdmin {
+	if (*roleCode != "owner") && (*roleCode != "admin") {
 		return nil, ErrForbidden
 	}
 	return s.tokenRepository.GetByOrganisation(ctx, organisationID, includeInactive)
@@ -143,15 +130,11 @@ func (s *tokenService) Update(ctx context.Context, organisationID, actorID, toke
 		tokenRepo := repository.NewTokensRepository(tx)
 		orgMemberRepo := repository.NewOrganisationMembersRepository(tx)
 
-		isOwner, err := orgMemberRepo.HasRole(ctx, organisationID, actorID, "owner")
+		roleCode, err := orgMemberRepo.GetRole(ctx, organisationID, actorID)
 		if err != nil {
 			return err
 		}
-		isAdmin, err := orgMemberRepo.HasRole(ctx, organisationID, actorID, "admin")
-		if err != nil {
-			return err
-		}
-		if !isOwner && !isAdmin {
+		if (*roleCode != "owner") && (*roleCode != "admin") {
 			return ErrForbidden
 		}
 		token, err := tokenRepo.GetByID(ctx, tokenID, organisationID)
@@ -182,15 +165,11 @@ func (s *tokenService) Delete(ctx context.Context, organisationID, actorID, toke
 	return s.txManager.WithinTransaction(ctx, func(tx pgx.Tx) error {
 		tokenRepo := repository.NewTokensRepository(tx)
 		orgMemberRepo := repository.NewOrganisationMembersRepository(tx)
-		isOwner, err := orgMemberRepo.HasRole(ctx, organisationID, actorID, "owner")
+		roleCode, err := orgMemberRepo.GetRole(ctx, organisationID, actorID)
 		if err != nil {
 			return err
 		}
-		isAdmin, err := orgMemberRepo.HasRole(ctx, organisationID, actorID, "admin")
-		if err != nil {
-			return err
-		}
-		if !isAdmin && !isOwner {
+		if (*roleCode != "owner") && (*roleCode != "admin") {
 			return ErrForbidden
 		}
 		return tokenRepo.Delete(ctx, tokenID, organisationID)
