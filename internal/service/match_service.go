@@ -13,7 +13,7 @@ import (
 
 type MatchService interface {
 	Create(ctx context.Context, actorID uuid.UUID, match *model.Match) error
-	GetByID(ctx context.Context, matchID uuid.UUID) (*model.Match, error)
+	GetByID(ctx context.Context, matchID, organisationID uuid.UUID) (*model.Match, error)
 	List(ctx context.Context, groupID uuid.UUID, limit, offset int) ([]model.Match, error)
 	Update(ctx context.Context, actorID, matchID, organisationID uuid.UUID, req MatchUpdate) error
 	Delete(ctx context.Context, actorID, matchID, organisationID uuid.UUID) error
@@ -26,12 +26,10 @@ type matchService struct {
 }
 
 type MatchUpdate struct {
-	Status         *string
-	StartedAt      *time.Time
-	OrganisationID *uuid.UUID
-	TokenID        *uuid.UUID
-	MapID          *uuid.UUID
-	GroupID        *uuid.UUID
+	Status    *string
+	StartedAt *time.Time
+	TokenID   *uuid.UUID
+	MapID     *uuid.UUID
 }
 
 func NewMatchService(txManager *database.TxManager, matchRepository repository.MatchRepository) MatchService {
@@ -57,12 +55,12 @@ func (s *matchService) Create(ctx context.Context, actorID uuid.UUID, match *mod
 	})
 }
 
-func (s *matchService) GetByID(ctx context.Context, matchID uuid.UUID) (*model.Match, error) {
-	return s.matchRepository.GetByID(ctx, matchID)
+func (s *matchService) GetByID(ctx context.Context, matchID, organisationID uuid.UUID) (*model.Match, error) {
+	return s.matchRepository.GetByID(ctx, matchID, organisationID)
 }
 
-func (s *matchService) List(ctx context.Context, groupID uuid.UUID, limit, offset int) ([]model.Match, error) {
-	return s.matchRepository.List(ctx, groupID, limit, offset)
+func (s *matchService) List(ctx context.Context, organisationID uuid.UUID, limit, offset int) ([]model.Match, error) {
+	return s.matchRepository.List(ctx, organisationID, limit, offset)
 }
 
 func (s *matchService) Update(ctx context.Context, actorID, matchID, organisationID uuid.UUID, req MatchUpdate) error {
@@ -77,18 +75,12 @@ func (s *matchService) Update(ctx context.Context, actorID, matchID, organisatio
 		if (*roleCode != "owner") && (*roleCode != "admin") {
 			return ErrForbidden
 		}
-		match, err := matchRepo.GetByID(ctx, matchID)
+		match, err := matchRepo.GetByID(ctx, matchID, organisationID)
 		if err != nil {
 			return err
 		}
-		if req.GroupID != nil {
-			match.GroupID = *req.GroupID
-		}
 		if req.MapID != nil {
 			match.MapID = *req.MapID
-		}
-		if req.OrganisationID != nil {
-			match.OrganisationID = *req.OrganisationID
 		}
 		if req.StartedAt != nil {
 			match.StartAt = req.StartedAt
@@ -115,6 +107,6 @@ func (s *matchService) Delete(ctx context.Context, actorID, matchID, organisatio
 		if (*roleCode != "owner") && (*roleCode != "admin") {
 			return ErrForbidden
 		}
-		return matchRepo.Delete(ctx, matchID)
+		return matchRepo.Delete(ctx, matchID, organisationID)
 	})
 }

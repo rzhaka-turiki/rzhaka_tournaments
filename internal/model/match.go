@@ -19,7 +19,6 @@ const (
 type Match struct {
 	ID             uuid.UUID
 	MapID          uuid.UUID
-	GroupID        uuid.UUID
 	OrganisationID uuid.UUID
 	StatsTokenID   *uuid.UUID
 	Status         MatchStatus

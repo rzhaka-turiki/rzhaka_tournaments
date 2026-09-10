@@ -9,10 +9,10 @@ import (
 
 type MatchRepository interface {
 	Create(ctx context.Context, match *model.Match) error
-	GetByID(ctx context.Context, id uuid.UUID) (*model.Match, error)
-	List(ctx context.Context, groupID uuid.UUID, limit, offset int) ([]model.Match, error)
+	GetByID(ctx context.Context, matchID, organisationID uuid.UUID) (*model.Match, error)
+	List(ctx context.Context, organisationID uuid.UUID, limit, offset int) ([]model.Match, error)
 	Update(ctx context.Context, match *model.Match) error
-	Delete(ctx context.Context, id uuid.UUID) error
+	Delete(ctx context.Context, matchID, organisationID uuid.UUID) error
 }
 
 type matchRepository struct {
@@ -30,7 +30,6 @@ func (r *matchRepository) Create(ctx context.Context, match *model.Match) error 
 	INSERT INTO matches (
 		map_id,
 		stats_token_id,
-		group_id,
 		organisation_id,
 		status,
 		start_at
@@ -47,7 +46,6 @@ func (r *matchRepository) Create(ctx context.Context, match *model.Match) error 
 		query,
 		match.MapID,
 		match.StatsTokenID,
-		match.GroupID,
 		match.OrganisationID,
 		match.Status,
 		match.StartAt,
@@ -58,13 +56,12 @@ func (r *matchRepository) Create(ctx context.Context, match *model.Match) error 
 	)
 }
 
-func (r *matchRepository) GetByID(ctx context.Context, id uuid.UUID) (*model.Match, error) {
+func (r *matchRepository) GetByID(ctx context.Context, matchID, organisationID uuid.UUID) (*model.Match, error) {
 	query := `
 	SELECT
 		id,
 		map_id,
 		stats_token_id,
-		group_id,
 		organisation_id,
 		status,
 		start_at,
@@ -72,14 +69,14 @@ func (r *matchRepository) GetByID(ctx context.Context, id uuid.UUID) (*model.Mat
 		updated_at
 	FROM matches
 	WHERE id = $1
+		AND organisation_id = $2
 	`
 
 	var match model.Match
-	err := r.db.QueryRow(ctx, query, id).Scan(
+	err := r.db.QueryRow(ctx, query, matchID, organisationID).Scan(
 		&match.ID,
 		&match.MapID,
 		&match.StatsTokenID,
-		&match.GroupID,
 		&match.OrganisationID,
 		&match.Status,
 		&match.StartAt,
@@ -92,26 +89,25 @@ func (r *matchRepository) GetByID(ctx context.Context, id uuid.UUID) (*model.Mat
 	return &match, nil
 }
 
-func (r *matchRepository) List(ctx context.Context, groupID uuid.UUID, limit, offset int) ([]model.Match, error) {
+func (r *matchRepository) List(ctx context.Context, organisationID uuid.UUID, limit, offset int) ([]model.Match, error) {
 	query := `
 	SELECT
 		id,
 		map_id,
 		stats_token_id,
-		group_id,
 		organisation_id,
 		status,
 		start_at,
 		created_at,
 		updated_at
 	FROM matches
-	WHERE group_id = $1
+	WHERE organisation_id = $1
 	ORDER BY start_at ASC
 	LIMIT $2
 	OFFSET $3
 	`
 	// Make a limit 4 that
-	rows, err := r.db.Query(ctx, query, groupID, limit, offset)
+	rows, err := r.db.Query(ctx, query, limit, offset)
 	if err != nil {
 		return nil, err
 	}
@@ -124,7 +120,6 @@ func (r *matchRepository) List(ctx context.Context, groupID uuid.UUID, limit, of
 			&match.ID,
 			&match.MapID,
 			&match.StatsTokenID,
-			&match.GroupID,
 			&match.OrganisationID,
 			&match.Status,
 			&match.StartAt,
@@ -148,19 +143,17 @@ func (r *matchRepository) Update(ctx context.Context, match *model.Match) error 
 	SET 
 		map_id = $1,
 		stats_token_id = $2,
-		group_id = $3,
-		organisation_id = $4,
-		status = $5,
-		start_at = $6,
+		organisation_id = $3,
+		status = $4,
+		start_at = $5,
 		updated_at = NOW()
-	WHERE id = $7
+	WHERE id = $6
 	`
 	cmd, err := r.db.Exec(
 		ctx,
 		query,
 		match.MapID,
 		match.StatsTokenID,
-		match.GroupID,
 		match.OrganisationID,
 		match.Status,
 		match.StartAt,
@@ -175,12 +168,13 @@ func (r *matchRepository) Update(ctx context.Context, match *model.Match) error 
 	return err
 }
 
-func (r *matchRepository) Delete(ctx context.Context, id uuid.UUID) error {
+func (r *matchRepository) Delete(ctx context.Context, matchID, organisationID uuid.UUID) error {
 	query := `
 	DELETE FROM matches
 	WHERE id = $1
+		AND organisation_id = $2
 	`
-	cmd, err := r.db.Exec(ctx, query, id)
+	cmd, err := r.db.Exec(ctx, query, matchID, organisationID)
 	if err != nil {
 		return err
 	}
