@@ -17,9 +17,8 @@ type MatchSettingsService interface {
 }
 
 type matchSettingsService struct {
-	txManager                     *database.TxManager
-	matchSettingsRepository       repository.MatchSettingsRepository
-	organisationMembersRepository repository.OrganisationMembersRepository
+	txManager               *database.TxManager
+	matchSettingsRepository repository.MatchSettingsRepository
 }
 
 type MatchSettingsUpdate struct {
