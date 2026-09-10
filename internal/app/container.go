@@ -40,7 +40,13 @@ func NewContainer(db *pgxpool.Pool, cfg *config.Config) (*Container, error) {
 	matchRepository := repository.NewMatchRepository(db)
 	// cleints
 	apexVerifierClient, err := apexverifier.NewClient(cfg.ApexVerifier.GRPCAddr)
+	if err != nil {
+		return nil, err
+	}
 	matchAPI, err := matchapi.NewClient(cfg.MatchAPI.GRPCAddr, cfg.MatchAPI.APIKey)
+	if err != nil {
+		return nil, err
+	}
 	// services
 	teamService := service.NewTeamService(txManager, teamRepository, teamMemberRepository, teamSnapshotRepository)
 	userService := service.NewUserService(userRepository, roleRepository)
@@ -61,9 +67,6 @@ func NewContainer(db *pgxpool.Pool, cfg *config.Config) (*Container, error) {
 	)
 	apexAccountService := service.NewApexAccountService(apexAccountRepository, apexVerifierClient)
 	matchService := service.NewMatchService(txManager, matchRepository)
-	if err != nil {
-		return nil, err
-	}
 	return &Container{
 		Repositories: Repositories{
 			User:                   userRepository,

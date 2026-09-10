@@ -20,9 +20,8 @@ type MatchService interface {
 }
 
 type matchService struct {
-	txManager           *database.TxManager
-	matchRepository     repository.MatchRepository
-	orgMemberRepository repository.OrganisationMembersRepository
+	txManager       *database.TxManager
+	matchRepository repository.MatchRepository
 }
 
 type MatchUpdate struct {
