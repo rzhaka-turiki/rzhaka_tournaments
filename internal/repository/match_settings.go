@@ -11,6 +11,7 @@ type MatchSettingsRepository interface {
 	Create(ctx context.Context, settings *model.MatchSettings) error
 	Update(ctx context.Context, settings *model.MatchSettings) error
 	GetByID(ctx context.Context, matchID uuid.UUID) (*model.MatchSettings, error)
+	List(ctx context.Context, matchIDs []uuid.UUID) ([]model.MatchSettings, error)
 	Delete(ctx context.Context, id uuid.UUID) error
 }
 
@@ -56,6 +57,54 @@ func (r *matchSettingsRepository) Create(ctx context.Context, settings *model.Ma
 		settings.AnonMode,
 		settings.FillBotsMode,
 	).Scan(&settings.CreatedAt, &settings.UpdatedAt)
+}
+
+func (r *matchSettingsRepository) List(ctx context.Context, matchIDs []uuid.UUID) ([]model.MatchSettings, error) {
+	query := `
+	SELECT
+		match_id,
+		drop_spots_enabled,
+		playlist_name,
+		map_id,
+		admin_chat,
+		team_rename,
+		self_assign,
+		aim_assist,
+		anon_mode,
+		fill_bots_mode,
+		created_at,
+		updated_at
+	FROM match_settings
+	WHERE match_id = ANY($1::uuid[])
+	`
+	rows, err := r.db.Query(ctx, query, matchIDs)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var matchSettingsList []model.MatchSettings
+	for rows.Next() {
+		var modelMatchSettings model.MatchSettings
+		err = rows.Scan(
+			&modelMatchSettings.MatchID,
+			&modelMatchSettings.DropSpotsEnabled,
+			&modelMatchSettings.PlaylistName,
+			&modelMatchSettings.MapID,
+			&modelMatchSettings.AdminChat,
+			&modelMatchSettings.TeamRename,
+			&modelMatchSettings.SelfAssign,
+			&modelMatchSettings.AimAssist,
+			&modelMatchSettings.AnonMode,
+			&modelMatchSettings.FillBotsMode,
+			&modelMatchSettings.CreatedAt,
+			&modelMatchSettings.UpdatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+		matchSettingsList = append(matchSettingsList, modelMatchSettings)
+	}
+	return matchSettingsList, nil
 }
 
 func (r *matchSettingsRepository) Update(ctx context.Context, settings *model.MatchSettings) error {
