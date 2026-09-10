@@ -13,4 +13,5 @@ type Repositories struct {
 	Permission             repository.PermissionRepository
 	ApexAccount            repository.ApexAccountRepository
 	Organisation           repository.OrganisationsRepository
+	Match                  repository.MatchRepository
 }

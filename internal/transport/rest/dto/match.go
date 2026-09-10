@@ -9,7 +9,6 @@ import (
 
 type CreateMatchRequest struct {
 	MapID          *uuid.UUID `json:"map_id"`
-	GroupID        uuid.UUID  `json:"group_id" binding:"required"`
 	OrganisationID uuid.UUID  `json:"organisation_id" binding:"required"`
 	StatsTokenID   *uuid.UUID `json:"stats_token_id"`
 	StartAt        *time.Time `json:"start_at"`
@@ -18,7 +17,6 @@ type CreateMatchRequest struct {
 type MatchResponse struct {
 	MatchID        uuid.UUID         `json:"id" binding:"required"`
 	MapID          uuid.UUID         `json:"map_id" binding:"required"`
-	GroupID        uuid.UUID         `json:"group_id" binding:"required"`
 	OrganisationID uuid.UUID         `json:"organisation_id" binding:"required"`
 	StatsTokenID   *uuid.UUID        `json:"stats_token_id"`
 	Status         model.MatchStatus `json:"status" binding:"required"`
@@ -27,11 +25,17 @@ type MatchResponse struct {
 	UpdatedAt      time.Time         `json:"updated_at"`
 }
 
+type UpdateMatchRequest struct {
+	MapID        *uuid.UUID `json:"map_id"`
+	StatsTokenID *uuid.UUID `json:"stats_token_id"`
+	Status       *string    `json:"status" binding:"required"`
+	StartAt      *time.Time `json:"start_at"`
+}
+
 func FromMatch(match *model.Match) MatchResponse {
 	return MatchResponse{
 		MatchID:        match.ID,
 		MapID:          match.MapID,
-		GroupID:        match.GroupID,
 		OrganisationID: match.OrganisationID,
 		StatsTokenID:   match.StatsTokenID,
 		Status:         match.Status,

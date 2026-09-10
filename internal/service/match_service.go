@@ -14,7 +14,7 @@ import (
 type MatchService interface {
 	Create(ctx context.Context, actorID uuid.UUID, match *model.Match) error
 	GetByID(ctx context.Context, matchID, organisationID uuid.UUID) (*model.Match, error)
-	List(ctx context.Context, groupID uuid.UUID, limit, offset int) ([]model.Match, error)
+	List(ctx context.Context, organisationID uuid.UUID, limit, offset *int) ([]model.Match, error)
 	Update(ctx context.Context, actorID, matchID, organisationID uuid.UUID, req MatchUpdate) error
 	Delete(ctx context.Context, actorID, matchID, organisationID uuid.UUID) error
 }
@@ -59,7 +59,7 @@ func (s *matchService) GetByID(ctx context.Context, matchID, organisationID uuid
 	return s.matchRepository.GetByID(ctx, matchID, organisationID)
 }
 
-func (s *matchService) List(ctx context.Context, organisationID uuid.UUID, limit, offset int) ([]model.Match, error) {
+func (s *matchService) List(ctx context.Context, organisationID uuid.UUID, limit, offset *int) ([]model.Match, error) {
 	return s.matchRepository.List(ctx, organisationID, limit, offset)
 }
 

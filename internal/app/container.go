@@ -37,6 +37,7 @@ func NewContainer(db *pgxpool.Pool, cfg *config.Config) (*Container, error) {
 	apexAccountRepository := repository.NewApexAccountRepository(db)
 	organisationRepository := repository.NewOrganisationRepository(db)
 	organisationMemberRepository := repository.NewOrganisationMembersRepository(db)
+	matchRepository := repository.NewMatchRepository(db)
 	// cleints
 	apexVerifierClient, err := apexverifier.NewClient(cfg.ApexVerifier.GRPCAddr)
 	matchAPI, err := matchapi.NewClient(cfg.MatchAPI.GRPCAddr, cfg.MatchAPI.APIKey)
@@ -59,7 +60,7 @@ func NewContainer(db *pgxpool.Pool, cfg *config.Config) (*Container, error) {
 		eventRepository,
 	)
 	apexAccountService := service.NewApexAccountService(apexAccountRepository, apexVerifierClient)
-
+	matchService := service.NewMatchService(txManager, matchRepository)
 	if err != nil {
 		return nil, err
 	}
@@ -75,6 +76,7 @@ func NewContainer(db *pgxpool.Pool, cfg *config.Config) (*Container, error) {
 			Permission:             permissionRepository,
 			Organisation:           organisationRepository,
 			ApexAccount:            apexAccountRepository,
+			Match:                  matchRepository,
 		},
 		Services: Services{
 			User:           userService,
@@ -85,6 +87,7 @@ func NewContainer(db *pgxpool.Pool, cfg *config.Config) (*Container, error) {
 			Organisation:   organisationService,
 			RolePermission: rolePermissionService,
 			ApexAccount:    apexAccountService,
+			Match:          matchService,
 		},
 		Clients: Clients{
 			ApexVerifier: apexVerifierClient,

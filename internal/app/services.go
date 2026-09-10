@@ -14,4 +14,6 @@ type Services struct {
 
 	RolePermission service.RolePermissionService
 	ApexAccount    service.ApexAccountService
+
+	Match service.MatchService
 }

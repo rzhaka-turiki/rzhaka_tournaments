@@ -14,4 +14,5 @@ type Handlers struct {
 	ApexAccounts    *handlers.ApexAccountHandler
 	Organisations   *handlers.OrganisationHandler
 	Tokens          *handlers.TokenHandler
+	Match           *handlers.MatchHandler
 }

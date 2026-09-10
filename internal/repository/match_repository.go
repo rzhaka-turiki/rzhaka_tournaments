@@ -4,13 +4,14 @@ import (
 	"context"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 	"github.com/rzhaka-turiki/rzhaka_tournaments/internal/model"
 )
 
 type MatchRepository interface {
 	Create(ctx context.Context, match *model.Match) error
 	GetByID(ctx context.Context, matchID, organisationID uuid.UUID) (*model.Match, error)
-	List(ctx context.Context, organisationID uuid.UUID, limit, offset int) ([]model.Match, error)
+	List(ctx context.Context, organisationID uuid.UUID, limit, offset *int) ([]model.Match, error)
 	Update(ctx context.Context, match *model.Match) error
 	Delete(ctx context.Context, matchID, organisationID uuid.UUID) error
 }
@@ -89,7 +90,7 @@ func (r *matchRepository) GetByID(ctx context.Context, matchID, organisationID u
 	return &match, nil
 }
 
-func (r *matchRepository) List(ctx context.Context, organisationID uuid.UUID, limit, offset int) ([]model.Match, error) {
+func (r *matchRepository) List(ctx context.Context, organisationID uuid.UUID, limit, offset *int) ([]model.Match, error) {
 	query := `
 	SELECT
 		id,
@@ -103,11 +104,18 @@ func (r *matchRepository) List(ctx context.Context, organisationID uuid.UUID, li
 	FROM matches
 	WHERE organisation_id = $1
 	ORDER BY start_at ASC
-	LIMIT $2
-	OFFSET $3
 	`
+	var rows pgx.Rows
+	var err error
+	if limit != nil && offset != nil {
+		query += `	LIMIT $2
+					OFFSET $3`
+		rows, err = r.db.Query(ctx, query, limit, offset)
+	} else {
+		rows, err = r.db.Query(ctx, query)
+	}
 	// Make a limit 4 that
-	rows, err := r.db.Query(ctx, query, limit, offset)
+
 	if err != nil {
 		return nil, err
 	}
