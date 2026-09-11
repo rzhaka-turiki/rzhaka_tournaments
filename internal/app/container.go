@@ -30,12 +30,32 @@ func NewContainer(db *pgxpool.Pool, cfg *config.Config) (*Container, error) {
 	eventRepository := repository.NewEventRepository(db)
 	permissionRepository := repository.NewPermissionRepository(db)
 	rolePermissionRepository := repository.NewRolePermissionRepository(db)
+	teamRepository := repository.NewTeamRepository(db)
+	teamMemberRepository := repository.NewTeamMemberRepository(db)
+	tokenRepository := repository.NewTokensRepository(db)
+	teamSnapshotRepository := repository.NewTeamSnapshotRepository(db)
 	apexAccountRepository := repository.NewApexAccountRepository(db)
+	organisationRepository := repository.NewOrganisationRepository(db)
+	organisationMemberRepository := repository.NewOrganisationMembersRepository(db)
+	matchRepository := repository.NewMatchRepository(db)
 	// cleints
 	apexVerifierClient, err := apexverifier.NewClient(cfg.ApexVerifier.GRPCAddr)
+	if err != nil {
+		return nil, err
+	}
 	matchAPI, err := matchapi.NewClient(cfg.MatchAPI.GRPCAddr, cfg.MatchAPI.APIKey)
+	if err != nil {
+		return nil, err
+	}
 	// services
+	teamService := service.NewTeamService(txManager, teamRepository, teamMemberRepository, teamSnapshotRepository)
 	userService := service.NewUserService(userRepository, roleRepository)
+	organisationService := service.NewOrganisationService(
+		txManager,
+		organisationRepository,
+		organisationMemberRepository,
+	)
+	tokenService := service.NewTokenService(txManager, matchAPI, tokenRepository, organisationRepository, organisationMemberRepository)
 	roleService := service.NewRoleService(txManager, roleRepository, eventRepository)
 	permissionService := service.NewPermissionService(permissionRepository)
 	rolePermissionService := service.NewRolePermissionService(
@@ -46,24 +66,31 @@ func NewContainer(db *pgxpool.Pool, cfg *config.Config) (*Container, error) {
 		eventRepository,
 	)
 	apexAccountService := service.NewApexAccountService(apexAccountRepository, apexVerifierClient)
-
-	if err != nil {
-		return nil, err
-	}
+	matchService := service.NewMatchService(txManager, matchRepository)
 	return &Container{
 		Repositories: Repositories{
-			User:        userRepository,
-			Role:        roleRepository,
-			Event:       eventRepository,
-			Permission:  permissionRepository,
-			ApexAccount: apexAccountRepository,
+			User:                   userRepository,
+			Role:                   roleRepository,
+			Event:                  eventRepository,
+			Team:                   teamRepository,
+			TeamMemberRepository:   teamMemberRepository,
+			TeamSnapshotRepository: teamSnapshotRepository,
+			TokenRepository:        tokenRepository,
+			Permission:             permissionRepository,
+			Organisation:           organisationRepository,
+			ApexAccount:            apexAccountRepository,
+			Match:                  matchRepository,
 		},
 		Services: Services{
 			User:           userService,
 			Role:           roleService,
 			Permission:     permissionService,
+			Team:           teamService,
+			Token:          tokenService,
+			Organisation:   organisationService,
 			RolePermission: rolePermissionService,
 			ApexAccount:    apexAccountService,
+			Match:          matchService,
 		},
 		Clients: Clients{
 			ApexVerifier: apexVerifierClient,

@@ -27,11 +27,9 @@ type RoleService interface {
 }
 
 type roleService struct {
-	txManager                *database.TxManager
-	roleRepository           repository.RoleRepository
-	eventRepository          repository.EventRepository
-	permissionRepository     repository.PermissionRepository
-	rolePermissionRepository repository.RolePermissionRepository
+	txManager       *database.TxManager
+	roleRepository  repository.RoleRepository
+	eventRepository repository.EventRepository
 }
 
 func NewRoleService(
@@ -229,11 +227,7 @@ func (s *roleService) RestoreRole(ctx context.Context, actorID uuid.UUID, roleID
 		if err := CheckPermission(ctx, roleRepo, actorID, permission.RoleRestore); err != nil {
 			return err
 		}
-		role, err := roleRepo.GetRoleByIDIncludeDeleted(ctx, roleID)
-		if err != nil {
-			return err
-		}
-		role, err = s.ensureRoleEditable(ctx, roleID)
+		role, err := s.ensureRoleEditable(ctx, roleID)
 		if err != nil {
 			return err
 		}
