@@ -83,11 +83,12 @@ func (s *organisationService) GetMemberOrganisations(ctx context.Context, userID
 func (s *organisationService) Update(ctx context.Context, actorID, organisationID uuid.UUID, req OrganisationUpdate) error {
 	return s.txManager.WithinTransaction(ctx, func(tx pgx.Tx) error {
 		organisationRepo := repository.NewOrganisationRepository(tx)
-		isOwner, err := organisationRepo.IsOwner(ctx, actorID, organisationID)
+		orgMemberRepo := repository.NewOrganisationMembersRepository(tx)
+		roleCode, err := orgMemberRepo.GetRole(ctx, organisationID, actorID)
 		if err != nil {
 			return err
 		}
-		if !isOwner {
+		if *roleCode != "owner" {
 			return ErrForbidden
 		}
 		organisation, err := organisationRepo.GetByID(ctx, organisationID)
@@ -119,11 +120,11 @@ func (s *organisationService) TransferOwnership(ctx context.Context, organisatio
 		organisationRepo := repository.NewOrganisationRepository(tx)
 		organisationMemberRepo := repository.NewOrganisationMembersRepository(tx)
 		orgRoleRepo := repository.NewOrganisationRoleRepository(tx)
-		isOwner, err := organisationRepo.IsOwner(ctx, actorID, organisationID)
+		roleCode, err := organisationMemberRepo.GetRole(ctx, organisationID, actorID)
 		if err != nil {
 			return err
 		}
-		if !isOwner {
+		if *roleCode != "owner" {
 			return ErrForbidden
 		}
 		isMember, err := organisationMemberRepo.Exists(ctx, newOwnerID, organisationID)
@@ -155,18 +156,18 @@ func (s *organisationService) TransferOwnership(ctx context.Context, organisatio
 }
 
 func (s *organisationService) RemoveMember(ctx context.Context, organisationID, actorID, memberID uuid.UUID) error {
-	isOwner, err := s.organisationRepository.IsOwner(ctx, actorID, organisationID)
+	roleCode, err := s.organisationMembersRepository.GetRole(ctx, organisationID, actorID)
 	if err != nil {
 		return err
 	}
-	if !isOwner {
+	if *roleCode != "owner" {
 		return ErrForbidden
 	}
-	isOwner, err = s.organisationRepository.IsOwner(ctx, memberID, organisationID)
+	roleCode, err = s.organisationMembersRepository.GetRole(ctx, organisationID, memberID)
 	if err != nil {
 		return err
 	}
-	if isOwner {
+	if *roleCode == "owner" {
 		return ErrCannotRemoveOwner
 	}
 	return s.organisationMembersRepository.Remove(ctx, organisationID, memberID)

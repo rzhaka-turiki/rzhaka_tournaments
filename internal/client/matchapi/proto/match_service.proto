@@ -37,6 +37,9 @@ message TokenInfo {
   string activation = 2;
   string expiration = 3;
   bool is_active = 4;
+  string stats_token = 5;
+  string admin_token = 6;
+  string player_token = 7;
 }
 
 message ListTokensResponse {

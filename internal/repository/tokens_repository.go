@@ -9,13 +9,13 @@ import (
 
 type TokenRepository interface {
 	Create(ctx context.Context, token *model.MatchAPIToken) error
-	GetByID(ctx context.Context, id uuid.UUID) (*model.MatchAPIToken, error)
+	GetByID(ctx context.Context, tokenID, organisationID uuid.UUID) (*model.MatchAPIToken, error)
 	GetByOrganisation(ctx context.Context, organisationID uuid.UUID, includeInactive bool) ([]model.MatchAPIToken, error)
 	CountActiveTokens(ctx context.Context, organisationID uuid.UUID) (int, error)
 	UpdateOrganisation(ctx context.Context, tokenID, organisationID uuid.UUID) error
 	Update(ctx context.Context, token *model.MatchAPIToken) error
 
-	Delete(ctx context.Context, id uuid.UUID) error
+	Delete(ctx context.Context, tokenID, organisationID uuid.UUID) error
 }
 
 type tokenRepository struct {
@@ -65,7 +65,7 @@ func (r *tokenRepository) Create(ctx context.Context, token *model.MatchAPIToken
 	)
 }
 
-func (r *tokenRepository) GetByID(ctx context.Context, id uuid.UUID) (*model.MatchAPIToken, error) {
+func (r *tokenRepository) GetByID(ctx context.Context, tokenID, organisationID uuid.UUID) (*model.MatchAPIToken, error) {
 	query := `
 	SELECT
 		id,
@@ -81,11 +81,12 @@ func (r *tokenRepository) GetByID(ctx context.Context, id uuid.UUID) (*model.Mat
 		updated_at
 	FROM match_api_tokens
 	WHERE id = $1
+		AND organisation_id = $2
 	`
 
 	var token model.MatchAPIToken
 
-	err := r.db.QueryRow(ctx, query, id).Scan(
+	err := r.db.QueryRow(ctx, query, tokenID, organisationID).Scan(
 		&token.ID,
 		&token.MatchAPITokenID,
 		&token.AddedBy,
@@ -228,13 +229,14 @@ func (r *tokenRepository) Update(ctx context.Context, token *model.MatchAPIToken
 	return nil
 }
 
-func (r *tokenRepository) Delete(ctx context.Context, id uuid.UUID) error {
+func (r *tokenRepository) Delete(ctx context.Context, tokenID, organisationID uuid.UUID) error {
 	query := `
 	DELETE 
 	FROM match_api_tokens
 	WHERE id = $1
+		AND organisation_id = $2
 	`
-	result, err := r.db.Exec(ctx, query, id)
+	result, err := r.db.Exec(ctx, query, tokenID, organisationID)
 	if err != nil {
 		return err
 	}

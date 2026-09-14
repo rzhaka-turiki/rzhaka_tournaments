@@ -230,6 +230,9 @@ func (r *organisationPaymentsRepository) GetBySubscriptionID(ctx context.Context
 		&payment.CreatedAt,
 		&payment.UpdatedAt,
 	)
+	if err != nil {
+		return nil, err
+	}
 	payment.Amount, err = decimal.NewFromString(amountStr)
 	if err != nil {
 		return nil, fmt.Errorf("parse points: %w", err)

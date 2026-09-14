@@ -6,7 +6,6 @@ import (
 	matchapipb "github.com/rzhaka-turiki/rzhaka_tournaments/internal/client/matchapi/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	"google.golang.org/grpc/metadata"
 )
 
 type Client interface {
@@ -36,13 +35,13 @@ func NewClient(addr, apiKey string) (Client, error) {
 	}, nil
 }
 
-func (c *client) contextWithAuth(ctx context.Context) context.Context {
+/*func (c *client) contextWithAuth(ctx context.Context) context.Context {
 	return metadata.AppendToOutgoingContext(
 		ctx,
 		"authorization",
 		"Bearer "+c.apiKey,
 	)
-}
+}*/
 
 func (c *client) AddToken(ctx context.Context, req *matchapipb.AddTokenRequest) (*matchapipb.AddTokenResponse, error) {
 	return c.client.AddToken(ctx, req)

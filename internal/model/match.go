@@ -17,14 +17,14 @@ const (
 )
 
 type Match struct {
-	ID           uuid.UUID
-	MapID        uuid.UUID
-	GroupID      uuid.UUID
-	StatsTokenID *uuid.UUID
-	Status       MatchStatus
-	StartAt      *time.Time
-	CreatedAt    time.Time
-	UpdatedAt    time.Time
+	ID             uuid.UUID
+	MapID          uuid.UUID
+	OrganisationID uuid.UUID
+	StatsTokenID   *uuid.UUID
+	Status         MatchStatus
+	StartAt        *time.Time
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
 }
 
 type MatchSettings struct {
