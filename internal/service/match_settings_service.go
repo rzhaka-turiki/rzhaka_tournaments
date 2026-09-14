@@ -13,7 +13,7 @@ import (
 type MatchSettingsService interface {
 	// likely need just a matchSettings model
 	Create(ctx context.Context, actorID, organisationID uuid.UUID, matchSettings *model.MatchSettings) error
-	GetByMatchID(ctx context.Context, matchID uuid.UUID) (*model.MatchSettings, error)
+	GetByMatchID(ctx context.Context, matchID, organisationID uuid.UUID) (*model.MatchSettings, error)
 	List(ctx context.Context, matchIDs []uuid.UUID) ([]model.MatchSettings, error)
 	Update(ctx context.Context, organisationID, actorID, matchID uuid.UUID, req MatchSettingsUpdate) error
 	Delete(ctx context.Context, organisationID, actorID, matchID uuid.UUID) error
@@ -60,7 +60,7 @@ func (s *matchSettingsService) Create(ctx context.Context, actorID, organisation
 }
 
 // Да, это репчик
-func (s *matchSettingsService) GetByMatchID(ctx context.Context, matchID uuid.UUID) (*model.MatchSettings, error) {
+func (s *matchSettingsService) GetByMatchID(ctx context.Context, matchID, organisationID uuid.UUID) (*model.MatchSettings, error) {
 	return s.matchSettingsRepository.GetByID(ctx, matchID)
 }
 
