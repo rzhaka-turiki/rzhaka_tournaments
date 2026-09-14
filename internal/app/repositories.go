@@ -14,4 +14,5 @@ type Repositories struct {
 	ApexAccount            repository.ApexAccountRepository
 	Organisation           repository.OrganisationsRepository
 	Match                  repository.MatchRepository
+	MatchSettings          repository.MatchSettingsRepository
 }

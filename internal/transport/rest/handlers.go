@@ -15,4 +15,5 @@ type Handlers struct {
 	Organisations   *handlers.OrganisationHandler
 	Tokens          *handlers.TokenHandler
 	Match           *handlers.MatchHandler
+	MatchSettings   *handlers.MatchSettingsHandler
 }
