@@ -6,7 +6,7 @@ import (
 )
 
 func registerMatchSettings(rg *gin.RouterGroup, h *handlers.MatchSettingsHandler) {
-	matches := rg.Group("organisations/:organisation_id/matches/:match_id")
+	matches := rg.Group("organisations/:organisation_id/matches/:match_id/settings")
 	{
 		matches.POST("", h.Create)
 		matches.GET("", h.GetByID)
