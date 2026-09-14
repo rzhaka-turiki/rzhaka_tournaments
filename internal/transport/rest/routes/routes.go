@@ -23,5 +23,6 @@ func RegisterRoutes(
 		registerOrganisations(v1, h.Organisations)
 		registerTokens(v1, h.Tokens)
 		registerMatches(v1, h.Match)
+		registerMatchSettings(v1, h.MatchSettings)
 	}
 }
