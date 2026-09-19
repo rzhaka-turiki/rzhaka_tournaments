@@ -74,7 +74,7 @@ func Load() (*Config, error) {
 		Bot: BotConfig{
 			Token: getEnv("BOT_TOKEN", ""),
 		},
-		// 
+		// not added yet
 		JWT: JWTConfig{
 			PublicKeyPath: getEnv("JWT_PUBLIC_KEY", "./keys/public.pem"),
 			AccessTTL:     15 * time.Minute,
