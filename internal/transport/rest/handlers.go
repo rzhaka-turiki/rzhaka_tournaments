@@ -16,4 +16,5 @@ type Handlers struct {
 	Tokens          *handlers.TokenHandler
 	Match           *handlers.MatchHandler
 	MatchSettings   *handlers.MatchSettingsHandler
+	MatchSlots      *handlers.MatchSlotHandler
 }

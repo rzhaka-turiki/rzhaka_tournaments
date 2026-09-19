@@ -17,4 +17,5 @@ type Services struct {
 
 	Match         service.MatchService
 	MatchSettings service.MatchSettingsService
+	MatchSlot     service.MatchSlotService
 }
