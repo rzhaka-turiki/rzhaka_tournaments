@@ -58,23 +58,23 @@ func Load() (*Config, error) {
 		Server: ServerConfig{
 			Port: getEnv("SERVER_PORT", "8080"),
 		},
-
+		// likely will be on the same server
 		Database: DatabaseConfig{
 			URL: getEnv("DATABASE_URL", ""),
 		},
-
+		// likely will be on the same server
 		Results: ResultsConfig{
 			GRPCAddr: getEnv("GRPC_RESULTS_ADDR", "results:50051"),
 		},
-
+		// not added for now
 		Redis: RedisConfig{
 			Addr: getEnv("REDIS_ADDR", ""),
 		},
-
+		// not added
 		Bot: BotConfig{
 			Token: getEnv("BOT_TOKEN", ""),
 		},
-
+		// 
 		JWT: JWTConfig{
 			PublicKeyPath: getEnv("JWT_PUBLIC_KEY", "./keys/public.pem"),
 			AccessTTL:     15 * time.Minute,
