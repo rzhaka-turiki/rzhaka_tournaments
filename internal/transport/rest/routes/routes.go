@@ -24,5 +24,7 @@ func RegisterRoutes(
 		registerTokens(v1, h.Tokens)
 		registerMatches(v1, h.Match)
 		registerMatchSettings(v1, h.MatchSettings)
+		registerMatchSlots(v1, h.MatchSlots)
+		registerMatchSlotPlayers(v1, h.MatchSlotPlayers)
 	}
 }

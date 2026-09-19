@@ -16,4 +16,5 @@ type Repositories struct {
 	Match                  repository.MatchRepository
 	MatchSettings          repository.MatchSettingsRepository
 	MatchSlot              repository.MatchSlotRepository
+	MatchSlotPlayer        repository.MatchSlotPlayerRepository
 }

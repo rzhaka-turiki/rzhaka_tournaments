@@ -15,7 +15,8 @@ type Services struct {
 	RolePermission service.RolePermissionService
 	ApexAccount    service.ApexAccountService
 
-	Match         service.MatchService
-	MatchSettings service.MatchSettingsService
-	MatchSlot     service.MatchSlotService
+	Match           service.MatchService
+	MatchSettings   service.MatchSettingsService
+	MatchSlot       service.MatchSlotService
+	MatchSlotPlayer service.MatchSlotPlayerService
 }

@@ -40,6 +40,7 @@ func NewContainer(db *pgxpool.Pool, cfg *config.Config) (*Container, error) {
 	matchRepository := repository.NewMatchRepository(db)
 	matchSettingsRepository := repository.NewMatchSettingsRepository(db)
 	matchSlotRepository := repository.NewMatchSlotRepository(db)
+	matchSlotPlayerRepository := repository.NewMatchSlotPlayerRepository(db)
 	// cleints
 	apexVerifierClient, err := apexverifier.NewClient(cfg.ApexVerifier.GRPCAddr)
 	if err != nil {
@@ -71,6 +72,7 @@ func NewContainer(db *pgxpool.Pool, cfg *config.Config) (*Container, error) {
 	matchService := service.NewMatchService(txManager, matchRepository)
 	matchSettingsService := service.NewMatchSettingsService(txManager, matchSettingsRepository)
 	matchSlotService := service.NewMatchSlotService(txManager, matchSlotRepository)
+	matchSlotPlayerService := service.NewMatchSlotPlayerService(txManager, matchSlotPlayerRepository)
 	return &Container{
 		Repositories: Repositories{
 			User:                   userRepository,
@@ -86,19 +88,21 @@ func NewContainer(db *pgxpool.Pool, cfg *config.Config) (*Container, error) {
 			Match:                  matchRepository,
 			MatchSettings:          matchSettingsRepository,
 			MatchSlot:              matchSlotRepository,
+			MatchSlotPlayer:        matchSlotPlayerRepository,
 		},
 		Services: Services{
-			User:           userService,
-			Role:           roleService,
-			Permission:     permissionService,
-			Team:           teamService,
-			Token:          tokenService,
-			Organisation:   organisationService,
-			RolePermission: rolePermissionService,
-			ApexAccount:    apexAccountService,
-			Match:          matchService,
-			MatchSettings:  matchSettingsService,
-			MatchSlot:      matchSlotService,
+			User:            userService,
+			Role:            roleService,
+			Permission:      permissionService,
+			Team:            teamService,
+			Token:           tokenService,
+			Organisation:    organisationService,
+			RolePermission:  rolePermissionService,
+			ApexAccount:     apexAccountService,
+			Match:           matchService,
+			MatchSettings:   matchSettingsService,
+			MatchSlot:       matchSlotService,
+			MatchSlotPlayer: matchSlotPlayerService,
 		},
 		Clients: Clients{
 			ApexVerifier: apexVerifierClient,
