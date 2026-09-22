@@ -2,7 +2,7 @@ CREATE TABLE match_result_slots (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
     match_result_id UUID NOT NULL
-        REFERENCES match_results(id) ON DELETE CASCADE,
+        REFERENCES match_results(match_id) ON DELETE CASCADE,
     
     slot_number INT NOT NULL,
 
