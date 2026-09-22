@@ -19,4 +19,6 @@ type Services struct {
 	MatchSettings   service.MatchSettingsService
 	MatchSlot       service.MatchSlotService
 	MatchSlotPlayer service.MatchSlotPlayerService
+
+	MatchResult service.MatchResultService
 }

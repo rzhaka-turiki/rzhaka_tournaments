@@ -12,9 +12,13 @@ type Repositories struct {
 	TokenRepository        repository.TokenRepository
 	Permission             repository.PermissionRepository
 	ApexAccount            repository.ApexAccountRepository
-	Organisation           repository.OrganisationsRepository
-	Match                  repository.MatchRepository
-	MatchSettings          repository.MatchSettingsRepository
-	MatchSlot              repository.MatchSlotRepository
-	MatchSlotPlayer        repository.MatchSlotPlayerRepository
+
+	Organisation repository.OrganisationsRepository
+
+	Match           repository.MatchRepository
+	MatchSettings   repository.MatchSettingsRepository
+	MatchSlot       repository.MatchSlotRepository
+	MatchSlotPlayer repository.MatchSlotPlayerRepository
+
+	MatchResult repository.MatchResultRepository
 }

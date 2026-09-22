@@ -13,7 +13,6 @@ import (
 type Container struct {
 	// repos
 	Repositories Repositories
-
 	//services
 	Services Services
 	// transaction man
@@ -25,22 +24,35 @@ func NewContainer(db *pgxpool.Pool, cfg *config.Config) (*Container, error) {
 	//tx man
 	txManager := database.NewTxManager(db)
 	// repos
+	// User
 	userRepository := repository.NewUserRepository(db)
 	roleRepository := repository.NewRoleRepository(db)
 	eventRepository := repository.NewEventRepository(db)
 	permissionRepository := repository.NewPermissionRepository(db)
 	rolePermissionRepository := repository.NewRolePermissionRepository(db)
+
+	// Team
 	teamRepository := repository.NewTeamRepository(db)
 	teamMemberRepository := repository.NewTeamMemberRepository(db)
-	tokenRepository := repository.NewTokensRepository(db)
 	teamSnapshotRepository := repository.NewTeamSnapshotRepository(db)
+
+	// Token
+	tokenRepository := repository.NewTokensRepository(db)
+
+	// Apex accounts
 	apexAccountRepository := repository.NewApexAccountRepository(db)
+
+	// Organisation
 	organisationRepository := repository.NewOrganisationRepository(db)
 	organisationMemberRepository := repository.NewOrganisationMembersRepository(db)
+
+	// Match
 	matchRepository := repository.NewMatchRepository(db)
 	matchSettingsRepository := repository.NewMatchSettingsRepository(db)
 	matchSlotRepository := repository.NewMatchSlotRepository(db)
 	matchSlotPlayerRepository := repository.NewMatchSlotPlayerRepository(db)
+	matchResultRepository := repository.NewMatchResultRepository(db)
+
 	// cleints
 	apexVerifierClient, err := apexverifier.NewClient(cfg.ApexVerifier.GRPCAddr)
 	if err != nil {
@@ -51,7 +63,9 @@ func NewContainer(db *pgxpool.Pool, cfg *config.Config) (*Container, error) {
 		return nil, err
 	}
 	// services
+	// Team
 	teamService := service.NewTeamService(txManager, teamRepository, teamMemberRepository, teamSnapshotRepository)
+
 	userService := service.NewUserService(userRepository, roleRepository)
 	organisationService := service.NewOrganisationService(
 		txManager,
@@ -69,10 +83,13 @@ func NewContainer(db *pgxpool.Pool, cfg *config.Config) (*Container, error) {
 		eventRepository,
 	)
 	apexAccountService := service.NewApexAccountService(apexAccountRepository, apexVerifierClient)
+
+	// Match
 	matchService := service.NewMatchService(txManager, matchRepository)
 	matchSettingsService := service.NewMatchSettingsService(txManager, matchSettingsRepository)
 	matchSlotService := service.NewMatchSlotService(txManager, matchSlotRepository)
 	matchSlotPlayerService := service.NewMatchSlotPlayerService(txManager, matchSlotPlayerRepository)
+	matchResultService := service.NewMatchResultService(txManager, matchResultRepository, matchRepository)
 	return &Container{
 		Repositories: Repositories{
 			User:                   userRepository,
@@ -89,6 +106,7 @@ func NewContainer(db *pgxpool.Pool, cfg *config.Config) (*Container, error) {
 			MatchSettings:          matchSettingsRepository,
 			MatchSlot:              matchSlotRepository,
 			MatchSlotPlayer:        matchSlotPlayerRepository,
+			MatchResult:            matchResultRepository,
 		},
 		Services: Services{
 			User:            userService,
@@ -103,6 +121,7 @@ func NewContainer(db *pgxpool.Pool, cfg *config.Config) (*Container, error) {
 			MatchSettings:   matchSettingsService,
 			MatchSlot:       matchSlotService,
 			MatchSlotPlayer: matchSlotPlayerService,
+			MatchResult:     matchResultService,
 		},
 		Clients: Clients{
 			ApexVerifier: apexVerifierClient,

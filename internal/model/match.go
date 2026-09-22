@@ -55,6 +55,7 @@ type MatchSlot struct {
 	UpdatedAt  time.Time
 }
 
+// Done
 type MatchSlotPlayer struct {
 	ID              uuid.UUID
 	MatchSlotID     uuid.UUID

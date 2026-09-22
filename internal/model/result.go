@@ -8,8 +8,8 @@ import (
 )
 
 type MatchResult struct {
-	ID               uuid.UUID
-	MatchID          *uuid.UUID
+	// Result couldn't be created w/out MatchID.
+	MatchID          uuid.UUID
 	ExternalMID      string
 	MapID            *uuid.UUID
 	MapName          string
