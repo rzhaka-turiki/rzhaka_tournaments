@@ -215,6 +215,9 @@ type TokenInfo struct {
 	Activation    string                 `protobuf:"bytes,2,opt,name=activation,proto3" json:"activation,omitempty"`
 	Expiration    string                 `protobuf:"bytes,3,opt,name=expiration,proto3" json:"expiration,omitempty"`
 	IsActive      bool                   `protobuf:"varint,4,opt,name=is_active,json=isActive,proto3" json:"is_active,omitempty"`
+	StatsToken    string                 `protobuf:"bytes,5,opt,name=stats_token,json=statsToken,proto3" json:"stats_token,omitempty"`
+	AdminToken    string                 `protobuf:"bytes,6,opt,name=admin_token,json=adminToken,proto3" json:"admin_token,omitempty"`
+	PlayerToken   string                 `protobuf:"bytes,7,opt,name=player_token,json=playerToken,proto3" json:"player_token,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -275,6 +278,27 @@ func (x *TokenInfo) GetIsActive() bool {
 		return x.IsActive
 	}
 	return false
+}
+
+func (x *TokenInfo) GetStatsToken() string {
+	if x != nil {
+		return x.StatsToken
+	}
+	return ""
+}
+
+func (x *TokenInfo) GetAdminToken() string {
+	if x != nil {
+		return x.AdminToken
+	}
+	return ""
+}
+
+func (x *TokenInfo) GetPlayerToken() string {
+	if x != nil {
+		return x.PlayerToken
+	}
+	return ""
 }
 
 type ListTokensResponse struct {
@@ -1230,7 +1254,7 @@ const file_internal_client_matchapi_proto_match_service_proto_rawDesc = "" +
 	"onlyActive\x12\x1b\n" +
 	"\tpage_size\x18\x02 \x01(\x05R\bpageSize\x12\x1d\n" +
 	"\n" +
-	"page_token\x18\x03 \x01(\tR\tpageToken\"x\n" +
+	"page_token\x18\x03 \x01(\tR\tpageToken\"\xdd\x01\n" +
 	"\tTokenInfo\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x1e\n" +
 	"\n" +
@@ -1239,7 +1263,12 @@ const file_internal_client_matchapi_proto_match_service_proto_rawDesc = "" +
 	"\n" +
 	"expiration\x18\x03 \x01(\tR\n" +
 	"expiration\x12\x1b\n" +
-	"\tis_active\x18\x04 \x01(\bR\bisActive\"\x8a\x01\n" +
+	"\tis_active\x18\x04 \x01(\bR\bisActive\x12\x1f\n" +
+	"\vstats_token\x18\x05 \x01(\tR\n" +
+	"statsToken\x12\x1f\n" +
+	"\vadmin_token\x18\x06 \x01(\tR\n" +
+	"adminToken\x12!\n" +
+	"\fplayer_token\x18\a \x01(\tR\vplayerToken\"\x8a\x01\n" +
 	"\x12ListTokensResponse\x12+\n" +
 	"\x06tokens\x18\x01 \x03(\v2\x13.matchapi.TokenInfoR\x06tokens\x12&\n" +
 	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\x12\x1f\n" +

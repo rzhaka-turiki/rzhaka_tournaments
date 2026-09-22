@@ -21,5 +21,10 @@ func RegisterRoutes(
 		registerTeamRequests(v1, h.TeamInvites)
 		registerApexAccounts(v1, h.ApexAccounts)
 		registerOrganisations(v1, h.Organisations)
+		registerTokens(v1, h.Tokens)
+		registerMatches(v1, h.Match)
+		registerMatchSettings(v1, h.MatchSettings)
+		registerMatchSlots(v1, h.MatchSlots)
+		registerMatchSlotPlayers(v1, h.MatchSlotPlayers)
 	}
 }

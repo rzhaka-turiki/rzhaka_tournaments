@@ -13,7 +13,6 @@ import (
 type Container struct {
 	// repos
 	Repositories Repositories
-
 	//services
 	Services Services
 	// transaction man
@@ -25,17 +24,55 @@ func NewContainer(db *pgxpool.Pool, cfg *config.Config) (*Container, error) {
 	//tx man
 	txManager := database.NewTxManager(db)
 	// repos
+	// User
 	userRepository := repository.NewUserRepository(db)
 	roleRepository := repository.NewRoleRepository(db)
 	eventRepository := repository.NewEventRepository(db)
 	permissionRepository := repository.NewPermissionRepository(db)
 	rolePermissionRepository := repository.NewRolePermissionRepository(db)
+
+	// Team
+	teamRepository := repository.NewTeamRepository(db)
+	teamMemberRepository := repository.NewTeamMemberRepository(db)
+	teamSnapshotRepository := repository.NewTeamSnapshotRepository(db)
+
+	// Token
+	tokenRepository := repository.NewTokensRepository(db)
+
+	// Apex accounts
 	apexAccountRepository := repository.NewApexAccountRepository(db)
+
+	// Organisation
+	organisationRepository := repository.NewOrganisationRepository(db)
+	organisationMemberRepository := repository.NewOrganisationMembersRepository(db)
+
+	// Match
+	matchRepository := repository.NewMatchRepository(db)
+	matchSettingsRepository := repository.NewMatchSettingsRepository(db)
+	matchSlotRepository := repository.NewMatchSlotRepository(db)
+	matchSlotPlayerRepository := repository.NewMatchSlotPlayerRepository(db)
+	matchResultRepository := repository.NewMatchResultRepository(db)
+
 	// cleints
 	apexVerifierClient, err := apexverifier.NewClient(cfg.ApexVerifier.GRPCAddr)
+	if err != nil {
+		return nil, err
+	}
 	matchAPI, err := matchapi.NewClient(cfg.MatchAPI.GRPCAddr, cfg.MatchAPI.APIKey)
+	if err != nil {
+		return nil, err
+	}
 	// services
+	// Team
+	teamService := service.NewTeamService(txManager, teamRepository, teamMemberRepository, teamSnapshotRepository)
+
 	userService := service.NewUserService(userRepository, roleRepository)
+	organisationService := service.NewOrganisationService(
+		txManager,
+		organisationRepository,
+		organisationMemberRepository,
+	)
+	tokenService := service.NewTokenService(txManager, matchAPI, tokenRepository, organisationRepository, organisationMemberRepository)
 	roleService := service.NewRoleService(txManager, roleRepository, eventRepository)
 	permissionService := service.NewPermissionService(permissionRepository)
 	rolePermissionService := service.NewRolePermissionService(
@@ -47,23 +84,44 @@ func NewContainer(db *pgxpool.Pool, cfg *config.Config) (*Container, error) {
 	)
 	apexAccountService := service.NewApexAccountService(apexAccountRepository, apexVerifierClient)
 
-	if err != nil {
-		return nil, err
-	}
+	// Match
+	matchService := service.NewMatchService(txManager, matchRepository)
+	matchSettingsService := service.NewMatchSettingsService(txManager, matchSettingsRepository)
+	matchSlotService := service.NewMatchSlotService(txManager, matchSlotRepository)
+	matchSlotPlayerService := service.NewMatchSlotPlayerService(txManager, matchSlotPlayerRepository)
+	matchResultService := service.NewMatchResultService(txManager, matchResultRepository, matchRepository)
 	return &Container{
 		Repositories: Repositories{
-			User:        userRepository,
-			Role:        roleRepository,
-			Event:       eventRepository,
-			Permission:  permissionRepository,
-			ApexAccount: apexAccountRepository,
+			User:                   userRepository,
+			Role:                   roleRepository,
+			Event:                  eventRepository,
+			Team:                   teamRepository,
+			TeamMemberRepository:   teamMemberRepository,
+			TeamSnapshotRepository: teamSnapshotRepository,
+			TokenRepository:        tokenRepository,
+			Permission:             permissionRepository,
+			Organisation:           organisationRepository,
+			ApexAccount:            apexAccountRepository,
+			Match:                  matchRepository,
+			MatchSettings:          matchSettingsRepository,
+			MatchSlot:              matchSlotRepository,
+			MatchSlotPlayer:        matchSlotPlayerRepository,
+			MatchResult:            matchResultRepository,
 		},
 		Services: Services{
-			User:           userService,
-			Role:           roleService,
-			Permission:     permissionService,
-			RolePermission: rolePermissionService,
-			ApexAccount:    apexAccountService,
+			User:            userService,
+			Role:            roleService,
+			Permission:      permissionService,
+			Team:            teamService,
+			Token:           tokenService,
+			Organisation:    organisationService,
+			RolePermission:  rolePermissionService,
+			ApexAccount:     apexAccountService,
+			Match:           matchService,
+			MatchSettings:   matchSettingsService,
+			MatchSlot:       matchSlotService,
+			MatchSlotPlayer: matchSlotPlayerService,
+			MatchResult:     matchResultService,
 		},
 		Clients: Clients{
 			ApexVerifier: apexVerifierClient,

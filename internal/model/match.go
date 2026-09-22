@@ -16,17 +16,19 @@ const (
 	MatchStatusCancelled MatchStatus = "cancelled"
 )
 
+// done
 type Match struct {
-	ID           uuid.UUID
-	MapID        uuid.UUID
-	GroupID      uuid.UUID
-	StatsTokenID *uuid.UUID
-	Status       MatchStatus
-	StartAt      *time.Time
-	CreatedAt    time.Time
-	UpdatedAt    time.Time
+	ID             uuid.UUID
+	MapID          uuid.UUID
+	OrganisationID uuid.UUID
+	StatsTokenID   *uuid.UUID
+	Status         MatchStatus
+	StartAt        *time.Time
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
 }
 
+// done
 type MatchSettings struct {
 	MatchID          uuid.UUID
 	MapID            uuid.UUID
@@ -43,6 +45,7 @@ type MatchSettings struct {
 	UpdatedAt        time.Time
 }
 
+// done
 type MatchSlot struct {
 	ID         uuid.UUID
 	MatchID    uuid.UUID
@@ -52,6 +55,7 @@ type MatchSlot struct {
 	UpdatedAt  time.Time
 }
 
+// Done
 type MatchSlotPlayer struct {
 	ID              uuid.UUID
 	MatchSlotID     uuid.UUID
@@ -61,6 +65,7 @@ type MatchSlotPlayer struct {
 	UpdatedAt       time.Time
 }
 
+// done
 type MatchAPIToken struct {
 	ID              uuid.UUID
 	MatchAPITokenID int
